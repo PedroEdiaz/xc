@@ -59,75 +59,78 @@ int syntax( struct stack * op , token_t t, token_t *last )
 	return 0;
 }
 
-int read_chr( int fd, char *c, unsigned int * line, unsigned int * chr )
+void update_err( char c, unsigned int * line, unsigned int * chr )
 {
-	int r;
-	r=read( fd, c , 1 );
-
 	++(*chr);
-	if( *c == '\n' )
+	if( c == '\n' )
 	{
 		++*line;	
 		*chr=0;
 	}
-
-	return r;
 }
 
 char * parse( int fd, unsigned int * line, unsigned int * chr )
 {
 	char *msg = "Syntax error: '_'";
+	char s, i, buff[0xff];
+
 	char *c = msg+15;
 
 	struct stack st={0}, ct= {0}, op={0};
 	token_t t, last=FG_ERR;
 
-	while( read_chr( fd, c, line, chr ) )
+	while( s=read( fd, buff, 0xff ) )
 	{
-		switch( t=sx_token(&last,*c)  )
+		i=0;
+		while( i<s )
 		{
-		case FG_NUM:
+			update_err( *c=buff[i], line, chr );
+			switch( t=sx_token(&last,*c) )
+			{
+			case FG_NUM:
 #warning TODO: Parse constants
-			push( &ct, *c-'0' );
+				push( &ct, *c-'0' );
 		
-		default:
-			if( FLAG(last,FG_POP) )
-				pop(&op);
+			default:
+				if( FLAG(last,FG_POP) )
+					pop(&op);
 
-			while( t && op.i && peak(&op)>t )
-			{
-				push( &st, pop(&op) );
-				if( !optimize( &st, &ct ) )
-					return "Unrechable";
-			}
+				while( t && op.i && peak(&op)>t )
+				{
+					push( &st, pop(&op) );
+					if( !optimize( &st, &ct ) )
+						return "Unrechable";
+				}
 
-		case SX_OPB:
-		case SX_OPP:
-		case SX_BLK:
-			if( syntax( &op, t, &last ) ) 
-		case FG_ERR:
-				return msg;
+			case SX_OPB:
+			case SX_OPP:
+			case SX_BLK:
+				if( syntax( &op, t, &last ) ) 
+			case FG_ERR:
+					return msg;
 
-			if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
-				goto end;
-
-			switch( t )
-			{
-			case SX_SMC:
-				if( peak(&st) == t )
+				if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
 					goto end;
 
-			case FG_NUM:
-				push( &st, t );
-				goto end;
+				switch( t )
+				{
+				case SX_SMC:
+					if( peak(&st) == t )
+						goto end;
 
-			default:
+				case FG_NUM:
+					push( &st, t );
+					goto end;
+
+				default:
 				push( &op, t );
+				}
+
+
+			case FG_POP:
+			end:
 			}
-
-
-		case FG_POP:
-		end:
+			++i;
 		}
 	}
 
