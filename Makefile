@@ -1,6 +1,7 @@
 BIN = cc
 OBJ = \
 	cg.o \
+	ct.o \
 	st.o \
 	ps.o \
 	tk.o \

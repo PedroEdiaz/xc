@@ -4,7 +4,6 @@ A compiler for a C dialect
 Accomplish
 ----------
 * Working C-like syntatic symbols: '{', '}', ';', '(', ')'.
-* Single digit numeric constants.
 * Almost all C operators.
 * Syntax Check.
 * Simple optimizer.
@@ -40,7 +39,7 @@ Style-guide
 	* else
 	* break
 	* continue
-* Use pointers instead of vriable modifier like:
+* Use pointers instead of variable modifier like:
 	* const
 	* volatile
 	* register

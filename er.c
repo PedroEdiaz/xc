@@ -1,4 +1,5 @@
 #include <unistd.h>
+#define u8 unsigned char
 
 void write_n( int fd, int n )
 {
@@ -30,7 +31,7 @@ int strlen( char * s )
 	return p-s;
 }
 
-void write_err( char * s, char * file, unsigned int line, unsigned int chr )
+void write_err( char * s, char c, char * file, unsigned int line, unsigned int chr )
 {
 	char d[2] = { ':', '\n' };
 
@@ -44,5 +45,35 @@ void write_err( char * s, char * file, unsigned int line, unsigned int chr )
 	write( 2, d, 1 );
 
 	write( 2, s, strlen(s) );
+	write( 2, d, 1 );
+
+	if( c )
+		write( 2, &c, 1 );
+
 	write( 2, d+1, 1 );
+}
+
+u8 read_chr( u8 * i, u8 s, char * buff,
+	char * c, int fd, unsigned int * line, unsigned int * chr )
+{
+	if( ! *i )
+		s=read( fd, buff, 0xff );
+
+	if( *i==s )
+	{
+		*i=0;
+		return s;
+	}
+
+	*c=buff[*i];
+	++*i;
+
+	++(*chr);
+	if( *c == '\n' )
+	{
+		++*line;	
+		*chr=0;
+	}
+
+	return  s;
 }

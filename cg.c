@@ -28,7 +28,7 @@ err:
 	return 0;
 }
 
-char *  codegen( struct stack * st, struct stack * ct )
+char codegen( struct stack * st, struct stack * ct )
 {
 	while( st->i )
 	{

@@ -59,85 +59,74 @@ int syntax( struct stack * op , token_t t, token_t *last )
 	return 0;
 }
 
-void update_err( char c, unsigned int * line, unsigned int * chr )
+char parse( int fd, unsigned int * line, unsigned int * chr )
 {
-	++(*chr);
-	if( c == '\n' )
-	{
-		++*line;	
-		*chr=0;
-	}
-}
+	char buff[0xff], c;
+	u8 s,i=0;
 
-char * parse( int fd, unsigned int * line, unsigned int * chr )
-{
-	char *msg = "Syntax error: '_'";
-	char s, i, buff[0xff];
-
-	char *c = msg+15;
-
+	int res;
 	struct stack st={0}, ct= {0}, op={0};
 	token_t t, last=FG_ERR;
 
-	while( s=read( fd, buff, 0xff ) )
+	while( s=read_chr( &i, s, buff, &c, fd, line, chr ) )
 	{
-		i=0;
-		while( i<s )
+	next_token:
+		switch( t=sx_token(&last,c) )
 		{
-			update_err( *c=buff[i], line, chr );
-			switch( t=sx_token(&last,*c) )
-			{
-			case FG_NUM:
-#warning TODO: Parse constants
-				push( &ct, *c-'0' );
+		case FG_NUM:
+
+			if( !(s=parse_cnt( &res, &i, s, buff, &c, fd, line, chr) )  )
+				goto end;
+			push( &ct, res );
+			push( &st, t );
+			last=t;
+			goto next_token;
+
 		
+		default:
+			if( FLAG(last,FG_POP) )
+				pop(&op);
+
+			while( t && op.i && peak(&op)>t )
+			{
+				push( &st, pop(&op) );
+				if( !(optimize( &st, &ct )) )
+					return '!';
+			}
+
+		case SX_OPB:
+		case SX_OPP:
+		case SX_BLK:
+			if( syntax( &op, t, &last ) ) 
+		case FG_ERR:
+				return c;
+
+			if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
+				goto end;
+
+			switch( t )
+			{
+			case SX_SMC:
+				if( peak(&st) == t )
+					goto end;
+			 	push( &st, t );
+			 	break;
+
 			default:
-				if( FLAG(last,FG_POP) )
-					pop(&op);
-
-				while( t && op.i && peak(&op)>t )
-				{
-					push( &st, pop(&op) );
-					if( !optimize( &st, &ct ) )
-						return "Unrechable";
-				}
-
-			case SX_OPB:
-			case SX_OPP:
-			case SX_BLK:
-				if( syntax( &op, t, &last ) ) 
-			case FG_ERR:
-					return msg;
-
-				if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
-					goto end;
-
-				switch( t )
-				{
-				case SX_SMC:
-					if( peak(&st) == t )
-						goto end;
-
-				case FG_NUM:
-					push( &st, t );
-					goto end;
-
-				default:
-				push( &op, t );
-				}
+			 	push( &op, t );
+			}
 
 
 			case FG_POP:
 			end:
-			}
-			++i;
 		}
 	}
 
-	*c='{'; 
+	c='{'; 
 
 	if( op.i )
-		return msg;
+err:
+		return c;
 
 	return codegen( &st, &ct );
 }
