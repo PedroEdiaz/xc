@@ -1,0 +1,51 @@
+A compiler for a C dialect
+==========================
+
+Accomplish
+----------
+* Working C-like syntatic symbols: '{', '}', ';', '(', ')'.
+* Single digit numeric constants.
+* Almost all C operators.
+* Syntax Check.
+* Simple optimizer.
+* Simple code generator: for a stack machine.
+
+Compile and test
+----------------
+	make; ./cc TEST.c
+
+Objectives
+----------
+* Use zig-like types: i8, u8, ... , i64, u64.
+* All keywords avoided by the style-guide must not be implemented.
+* All variables may be "static" and "volatile".
+* Compile options to force style-guide (+) at compile time.
+
+Style-guide
+-----------
++ Use snake_case when nameing variables or functions.
++ Indent with tabs in Allman style.
++ Declare variables at the top of the scope.
++ Only use Upercase for enums and preprocesor definitions.
++ use lowercase in every other case.
+* Use syscalls instead of libc.
+* Try using the preprocesor insted of:
+	* enums
+* Use the preprocesor insted of:
+	* inline
+	* typedef
+* Use "goto" and "while" insted of:
+	* for
+	* do
+	* else
+	* break
+	* continue
+* Use pointers instead of vriable modifier like:
+	* const
+	* volatile
+	* register
+	* extern
+	* static
+* Consider harmfull and avoid:
+	* auto
+	* unions
