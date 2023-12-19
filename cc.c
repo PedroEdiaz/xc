@@ -24,7 +24,8 @@ int main( int argc, char * argv[] )
 		if( fd < 0  )
 			goto err;
 	parse:
-		if( c=parse( fd, &data_line, &data_chr ) )
+		init_err();
+		if( c=parse( fd ) )
 		{	
 			msg="Syntax error";
 			goto err;
@@ -36,6 +37,6 @@ int main( int argc, char * argv[] )
 	return 0;
 
 err:
-	write_err( msg, c, data_file, data_line, data_chr );
+	write_err( msg, c, data_file );
 	return 1;
 }

@@ -59,30 +59,28 @@ int syntax( struct stack * op , token_t t, token_t *last )
 	return 0;
 }
 
-char parse( int fd, unsigned int * line, unsigned int * chr )
+char parse( int fd )
 {
-	char buff[0xff], c;
-	u8 s,i=0;
-
-	int res;
 	struct stack st={0}, ct= {0}, op={0};
 	token_t t, last=FG_ERR;
+	unsigned char c;
 
-	while( s=read_chr( &i, s, buff, &c, fd, line, chr ) )
+	while( (c=read_chr(fd))!=0xff )
 	{
 	next_token:
 		switch( t=sx_token(&last,c) )
 		{
 		case FG_NUM:
 
-			if( !(s=parse_cnt( &res, &i, s, buff, &c, fd, line, chr) )  )
-				goto end;
-			push( &ct, res );
+			push( &ct, parse_cnt( &c, fd ) );
 			push( &st, t );
 			last=t;
+
+			if( c == 0xff )
+				goto end;
+
 			goto next_token;
 
-		
 		default:
 			if( FLAG(last,FG_POP) )
 				pop(&op);
@@ -104,18 +102,17 @@ char parse( int fd, unsigned int * line, unsigned int * chr )
 			if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
 				goto end;
 
-			switch( t )
+			push( &op, t );
+
+			if( t == SX_SMC )
 			{
-			case SX_SMC:
+				pop( &op );
+
 				if( peak(&st) == t )
 					goto end;
+
 			 	push( &st, t );
-			 	break;
-
-			default:
-			 	push( &op, t );
 			}
-
 
 			case FG_POP:
 			end:

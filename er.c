@@ -31,7 +31,45 @@ int strlen( char * s )
 	return p-s;
 }
 
-void write_err( char * s, char c, char * file, unsigned int line, unsigned int chr )
+unsigned int line, chr;
+unsigned int i, s;
+char buff[0xff];
+
+unsigned int init_err( void )
+{
+	unsigned int r;
+	line=1;
+	chr=0;
+	return line;
+}
+
+char read_chr( int fd )
+{
+	char c;
+
+	if( !i || i==s )
+	{
+		i=0;
+		s=read( fd, buff, 0xff );
+	}
+
+	if( !s )
+		return 0xff;
+
+	c=buff[i];
+	++i;
+
+	++chr;
+	if( c == '\n' )
+	{
+		++line;	
+		chr=0;
+	}
+
+	return c;
+}
+
+void write_err( char * s, char c, char * file )
 {
 	char d[2] = { ':', '\n' };
 
@@ -51,29 +89,4 @@ void write_err( char * s, char c, char * file, unsigned int line, unsigned int c
 		write( 2, &c, 1 );
 
 	write( 2, d+1, 1 );
-}
-
-u8 read_chr( u8 * i, u8 s, char * buff,
-	char * c, int fd, unsigned int * line, unsigned int * chr )
-{
-	if( ! *i )
-		s=read( fd, buff, 0xff );
-
-	if( *i==s )
-	{
-		*i=0;
-		return s;
-	}
-
-	*c=buff[*i];
-	++*i;
-
-	++(*chr);
-	if( *c == '\n' )
-	{
-		++*line;	
-		*chr=0;
-	}
-
-	return  s;
 }
