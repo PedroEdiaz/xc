@@ -1,6 +1,6 @@
 #include "cc.h"
 
-int parse_cnt( char * c, int fd )
+int parse_ct( char * c, int fd )
 {
 	char base=10;
 	int res=0;

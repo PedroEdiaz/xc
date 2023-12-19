@@ -3,6 +3,7 @@
 enum
 {
 	SX_BLK=5,
+	SX_SPP,
 	SX_OPB,
 	SX_CLB,
 	SX_OPP,
@@ -17,6 +18,7 @@ token_t sx_token( token_t * last, char c )
 
 	switch( c )
 	{
+	case '#': return SX_SPP;
 	case ';': return SX_SMC;
 	case '{': return SX_OPB;
 	case '}': return SX_CLB;
@@ -70,9 +72,17 @@ char parse( int fd )
 	next_token:
 		switch( t=sx_token(&last,c) )
 		{
+		case SX_SPP:
+			parse_pp( &c, fd );
+
+			if( c == 0xff )
+				goto end;
+
+			goto next_token;
+
 		case FG_NUM:
 
-			push( &ct, parse_cnt( &c, fd ) );
+			push( &ct, parse_ct( &c, fd ) );
 			push( &st, t );
 			last=t;
 
@@ -80,6 +90,7 @@ char parse( int fd )
 				goto end;
 
 			goto next_token;
+
 
 		default:
 			if( FLAG(last,FG_POP) )

@@ -2,7 +2,7 @@
 
 enum 
 {
-	OP_ASG=11,
+	OP_ASG=12,
 	OP_LGO,
 	OP_LGA,
 	OP_BWO,

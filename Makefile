@@ -3,6 +3,7 @@ BIN = cc
 OBJ = \
 	cg.o \
 	ct.o \
+	pp.o \
 	st.o \
 	ps.o \
 	tk.o \

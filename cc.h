@@ -22,6 +22,5 @@ void write_n( int fd, int n );
 
 char read_chr( int fd  );
 
-int parse_cnt( char * c, int fd );
-
-
+int parse_ct( char * c, int fd );
+int parse_pp( char * c, int fd );
