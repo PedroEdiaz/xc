@@ -1,7 +1,6 @@
-#include <unistd.h>
-#define u8 unsigned char
+#include "cc.h"
 
-u8 parse_cnt( u8 * res, u8 * i, u8 s, char * buff,
+u8 parse_cnt( int * res, u8 * i, u8 s, char * buff,
 	char * c, int fd, unsigned int * line, unsigned int * chr )
 {
 	char base=10;

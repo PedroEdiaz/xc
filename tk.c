@@ -2,7 +2,6 @@
 
 enum 
 {
-#warning TODO: Ternary Operator
 	OP_ASG=11,
 	OP_LGO,
 	OP_LGA,

@@ -1,10 +1,9 @@
 #include <unistd.h>
 #include <fcntl.h>
-#include "st.h"
+#include "st.c"
+
 #define u8 unsigned char
 
-void write_err( char *, char, char *,  unsigned int, unsigned int  );
-void write_n( int fd, int n );
 
 #define FG_NUM 0b000
 #define FG_SFX 0b001 
@@ -19,3 +18,14 @@ int eval( token_t, int, int );
 
 char codegen( struct stack *, struct stack * );
 int optimize( struct stack *, struct stack * );
+
+void write_err( char *, char, char *,  unsigned int, unsigned int  );
+void write_n( int fd, int n );
+
+u8 read_chr( u8 * i, u8 s, char * buff,
+	char * c, int fd, unsigned int * line, unsigned int * chr );
+
+u8 parse_cnt( int * res, u8 * i, u8 s, char * buff,
+	char * c, int fd, unsigned int * line, unsigned int * chr );
+
+

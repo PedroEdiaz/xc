@@ -1,3 +1,4 @@
+
 BIN = cc
 OBJ = \
 	cg.o \
@@ -11,12 +12,9 @@ OBJ = \
 $(BIN): $(OBJ)
 	$(CC) -o $@ $(OBJ)
 
+st.o: st.c
+	$(CC) -DIMPLEMENT -c -o $@ st.c
+
 clean:
 	rm $(BIN) $(OBJ)
 
-.SUFFIXES: .c .h
-
-.c.o:
-	$(CC) -c -o $@ $<
-.h.o:
-	$(CC) -DIMPLEMENT -c -o $@ $<
