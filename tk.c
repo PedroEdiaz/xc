@@ -2,6 +2,7 @@
 
 enum 
 {
+#warning TODO: Ternary operator
 	OP_ASG=12,
 	OP_LGO,
 	OP_LGA,
@@ -31,7 +32,7 @@ enum
 	OP_UNA,
 };
 
-int eval( token_t op, int a, int b )
+ct_t eval( token_t op, ct_t a, ct_t b )
 {
 	switch( op )
 	{

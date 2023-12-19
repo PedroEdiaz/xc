@@ -1,9 +1,9 @@
 #include "cc.h"
 
-int parse_ct( char * c, int fd )
+ct_t parse_ct( char * c, int fd )
 {
 	char base=10;
-	int res=0;
+	ct_t res=0;
 
 	if( *c=='0' )
 	{

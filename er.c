@@ -1,7 +1,7 @@
 #include <unistd.h>
-#define u8 unsigned char
+#define ct_t unsigned long
 
-void write_n( int fd, int n )
+void write_n( int fd, ct_t n )
 {
 	unsigned char buff[0xff], i=0xff-1;
 

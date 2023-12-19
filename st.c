@@ -1,26 +1,41 @@
+#define ct_t unsigned long
+
 struct stack
 {
 	unsigned char i;
 	unsigned char body[0xff];
 };
 
-void push( struct stack * s,  unsigned char val );
-unsigned char pop( struct stack * s );
-unsigned char peak( struct stack * s );
+void push( struct stack * s,  ct_t val, char size );
+ct_t pop( struct stack * s , char size );
+ct_t peak( struct stack * s );
 
 #ifdef IMPLEMENT
 
-void push( struct stack * s, unsigned char val )
+void push( struct stack * s, ct_t val, char size )
 {
-	s->body[(s->i)++]=val;
+	while( size )
+	{
+		s->body[(s->i)++]=val;
+		val/=0xff;
+		--size;
+	}
 }
 
-unsigned char pop( struct stack * s )
+ct_t pop( struct stack * s,  char size )
 {
-	return s->body[--(s->i)];
+	ct_t res=0;
+	while( size )
+	{
+		res*=0xff;
+		res+=s->body[--(s->i)];
+		--size;
+	}
+
+	return res;
 }
 
-unsigned char peak( struct stack * s )
+ct_t peak( struct stack * s )
 {
 	return s->body[(s->i)-1];
 }

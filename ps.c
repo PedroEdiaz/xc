@@ -43,10 +43,10 @@ int syntax( struct stack * op , token_t t, token_t *last )
 		return 0;
 	case SX_CLP:
 		*last=FG_NUM;
-		return !(op->i && pop(op)==SX_OPP);
+		return !(op->i && pop(op,1)==SX_OPP);
 	case SX_CLB:
 		*last=FG_ERR;
-		return !(op->i && pop(op)==SX_OPB); 
+		return !(op->i && pop(op,1)==SX_OPB); 
 	case SX_OPB:
 	case SX_OPP:
 		*last=FG_ERR;
@@ -82,8 +82,8 @@ char parse( int fd )
 
 		case FG_NUM:
 
-			push( &ct, parse_ct( &c, fd ) );
-			push( &st, t );
+			push( &ct, parse_ct( &c, fd ), sizeof(ct_t) );
+			push( &st, t, 1 );
 			last=t;
 
 			if( c == 0xff )
@@ -94,11 +94,11 @@ char parse( int fd )
 
 		default:
 			if( FLAG(last,FG_POP) )
-				pop(&op);
+				pop(&op,1);
 
 			while( t && op.i && peak(&op)>t )
 			{
-				push( &st, pop(&op) );
+				push( &st, pop(&op,1), 1 );
 				if( !(optimize( &st, &ct )) )
 					return '!';
 			}
@@ -113,16 +113,16 @@ char parse( int fd )
 			if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
 				goto end;
 
-			push( &op, t );
+			push( &op, t, 1 );
 
 			if( t == SX_SMC )
 			{
-				pop( &op );
+				pop( &op, 1 );
 
-				if( peak(&st) == t )
+				if( peak(&st) == t || !st.i )
 					goto end;
 
-			 	push( &st, t );
+			 	push( &st, t, 1 );
 			}
 
 			case FG_POP:

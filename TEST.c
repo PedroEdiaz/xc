@@ -2,6 +2,7 @@
 {
 	#! Optimize multiple ';'
 	;;;;;
+	0x110;
 
 	#! Numeric constant in diferent bases
 	0b10001;
