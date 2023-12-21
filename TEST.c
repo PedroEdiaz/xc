@@ -1,21 +1,26 @@
 #! main function
 {
+	#! Nested ternary operator
+	1?0?3:4:5;
+	0?6:1?7:8;
+
 	#! Optimize multiple ';'
 	;;;;;
-	0x110;
 
-	#! Numeric constant in diferent bases
+	#! Numeric constants
 	0b10001;
 	021;
-	0x11;
+	0x110;
 
 
-	#! Operators and order of precedence
-	3*5+4*5;
-	(3+4)*5;
+	#! Operators with order of precedance
+	(3+2*2)*5;
 
-	#! Only sufix operator
+	#! Sufix operators
 	70++;
+
+
+
 
 	#! Implementation of increment, adding, and unary add
 	1+(+1);

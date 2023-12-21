@@ -4,10 +4,10 @@ A compiler for a C dialect
 Accomplish
 ----------
 * Working C-like syntatic symbols: '{', '}', ';', '(', ')'.
-* Almost all C operators.
+* All C operators.
 * Syntax Check.
-* Simple optimizer.
-* Simple code generator: for a stack machine.
+* Simple code generator, for an abstract stack machine.
+* Simple optimization, by pushing down the stack.
 
 Compile and test
 ----------------

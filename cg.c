@@ -3,27 +3,35 @@
 int optimize( struct stack * st, struct stack * ct )
 {
 	token_t t=pop(st,1);
-	int c;
+	ct_t b,c;
 
 	switch( arity(t) )
 	{
-	case 2:
+	case 3:
 		if( peak(st) )
-			goto err;
+			goto err1;
 
 		pop(st,1);
 		c=pop(ct,sizeof(ct_t));
+	case 2:
+		if( peak(st) )
+			goto err2;
+
+		pop(st,1);
+		b=pop(ct,sizeof(ct_t));
 	}
 
 	if( peak(st) )
-		goto err;
+		goto err3;
 
-	c=eval(t,pop(ct,sizeof(ct_t)),c);
-	push( ct, c, sizeof(ct_t) );
+	b=eval(t,pop(ct,sizeof(ct_t)),b,c);
+	push( ct, b, sizeof( ct_t) );
 
 	return 1;
 
-err:
+err3:
+err2:
+err1:
 	return 0;
 }
 

@@ -2,8 +2,8 @@
 
 enum 
 {
-#warning TODO: Ternary operator
 	OP_ASG=12,
+	OP_TRN,
 	OP_LGO,
 	OP_LGA,
 	OP_BWO,
@@ -32,10 +32,11 @@ enum
 	OP_UNA,
 };
 
-ct_t eval( token_t op, ct_t a, ct_t b )
+ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 {
 	switch( op )
 	{
+	case OP_TRN: return a?b:c;
 	case OP_DES: return a--;
 	case OP_INS: return a++;
 	case OP_UNA: return +a;
@@ -66,10 +67,17 @@ ct_t eval( token_t op, ct_t a, ct_t b )
 	return *(char*)0=0;
 }
 
+int assoc( token_t t )
+{
+	return t==OP_ASG || t==OP_TRN;
+}
+
 int arity( token_t t )
 {
 	switch( t )
 	{
+	case OP_TRN: 
+		return 3;
 	case OP_DES: 
 	case OP_INS: 
 	case OP_UNA: 
@@ -90,6 +98,19 @@ token_t token( token_t * last, char c )
 
 	switch( c )
 	{
+	case '?': 
+		if( *last )
+			return FG_ERR;
+
+		*last=SX_OPP;
+		return OP_TRN;
+
+	case ':': 
+		if( *last )
+			return FG_ERR;
+
+		*last=SX_CLP;
+		return OP_TRN;
 	case '/': return ( !*last )?OP_ALD:FG_ERR;
 	case '%': return ( !*last )?OP_ALM:FG_ERR;
 	case '*': return ( !*last )?OP_ALP:FG_ERR;

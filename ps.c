@@ -1,16 +1,5 @@
 #include "cc.h"
 
-enum
-{
-	SX_BLK=5,
-	SX_SPP,
-	SX_OPB,
-	SX_CLB,
-	SX_OPP,
-	SX_CLP,
-	SX_SMC,
-};
-
 token_t sx_token( token_t * last, char c )
 {
 	if( c <= ' ' )
@@ -42,7 +31,7 @@ int syntax( struct stack * op , token_t t, token_t *last )
 		*last=FG_ERR;
 		return 0;
 	case SX_CLP:
-		*last=FG_NUM;
+		*last=(*last==t)?FG_ERR:FG_NUM;
 		return !(op->i && pop(op,1)==SX_OPP);
 	case SX_CLB:
 		*last=FG_ERR;
@@ -56,6 +45,7 @@ int syntax( struct stack * op , token_t t, token_t *last )
 		return 0;
 	}
 
+	
 	*last= FLAG(*last, FG_SFX)? FG_NUM: t;
 
 	return 0;
@@ -81,7 +71,6 @@ char parse( int fd )
 			goto next_token;
 
 		case FG_NUM:
-
 			push( &ct, parse_ct( &c, fd ), sizeof(ct_t) );
 			push( &st, t, 1 );
 			last=t;
@@ -93,14 +82,25 @@ char parse( int fd )
 
 
 		default:
+			if( last==SX_CLP )
+				t=SX_CLP;
+
+
 			if( FLAG(last,FG_POP) )
 				pop(&op,1);
 
-			while( t && op.i && peak(&op)>t )
+			while( t && op.i && ( peak(&op)>t || ( peak(&op)==t && !assoc(t) ) ) )
 			{
 				push( &st, pop(&op,1), 1 );
 				if( !(optimize( &st, &ct )) )
 					return '!';
+			}
+
+			if( last==SX_OPP )
+			{
+				push( &op, t, 1 );
+				last=t;
+				t=SX_OPP;
 			}
 
 		case SX_OPB:
@@ -113,17 +113,17 @@ char parse( int fd )
 			if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
 				goto end;
 
-			push( &op, t, 1 );
 
 			if( t == SX_SMC )
 			{
-				pop( &op, 1 );
-
 				if( peak(&st) == t || !st.i )
 					goto end;
 
 			 	push( &st, t, 1 );
+			 	goto end;
 			}
+
+			push( &op, t, 1 );
 
 			case FG_POP:
 			end:
