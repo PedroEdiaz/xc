@@ -64,7 +64,9 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 	case OP_LGA: return a&&b;
 	case OP_LGO: return a||b;
 	}
-	return *(char*)0=0;
+
+	err( "Unreachable", 0x00, 1 );
+	return 1;
 }
 
 int assoc( token_t t )
@@ -100,17 +102,16 @@ token_t token( token_t * last, char c )
 	{
 	case '?': 
 		if( *last )
+		{
 			return FG_ERR;
-
-		*last=SX_OPP;
-		return OP_TRN;
-
+		}
+		*last=SX_OPP; return OP_TRN;
 	case ':': 
 		if( *last )
+		{
 			return FG_ERR;
-
-		*last=SX_CLP;
-		return OP_TRN;
+		}
+		*last=SX_CLP; return OP_TRN;
 	case '/': return ( !*last )?OP_ALD:FG_ERR;
 	case '%': return ( !*last )?OP_ALM:FG_ERR;
 	case '*': return ( !*last )?OP_ALP:FG_ERR;
@@ -178,6 +179,7 @@ token_t token( token_t * last, char c )
 		}
 		return OP_UNS;
 	}
-
-	return FG_ERR;
+	
+	err( "No token match", c, 1 );
+	return 1;
 }

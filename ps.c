@@ -19,36 +19,39 @@ token_t sx_token( token_t * last, char c )
 }
 
 #define FLAG( t, flag ) ( t<4 && t&flag )
+char * err_msg[2] = {"Syntax error", "Missing char"};
 
-int syntax( struct stack * op , token_t t, token_t *last )
+int syntax( struct stack * op , token_t t, token_t last )
 {
 	switch( t )
 	{
 	case SX_SMC:
-		if( peak(op)==SX_OPP || *last>SX_SMC )
-			return 1;
+		if( peak(op)==SX_OPP )
+			err( "Missing char ')' or ':'", 0x00, 1 );
 
-		*last=FG_ERR;
-		return 0;
+		if( last>SX_SMC )
+			err( err_msg[0], ';', 1 );
+
+		return FG_ERR;
 	case SX_CLP:
-		*last=(*last==t)?FG_ERR:FG_NUM;
-		return !(op->i && pop(op,1)==SX_OPP);
+		if( !(op->i && pop(op,1)==SX_OPP) )
+			err( err_msg[1], (last==t)?'?':'(', 1 );
+
+		return (last==t)?FG_ERR:FG_NUM;
 	case SX_CLB:
-		*last=FG_ERR;
-		return !(op->i && pop(op,1)==SX_OPB); 
+		if( !(op->i && pop(op,1)==SX_OPB)  )
+			err( err_msg[1], '{', 1 );
+
+		return FG_ERR;
 	case SX_OPB:
 	case SX_OPP:
-		*last=FG_ERR;
-		return 0;
+		return FG_ERR;
 	case SX_BLK:
-		*last=*last? t: *last;
-		return 0;
+		return last? t: last;
 	}
 
 	
-	*last= FLAG(*last, FG_SFX)? FG_NUM: t;
-
-	return 0;
+	return FLAG(last, FG_SFX)? FG_NUM: t;
 }
 
 char parse( int fd )
@@ -62,6 +65,9 @@ char parse( int fd )
 	next_token:
 		switch( t=sx_token(&last,c) )
 		{
+		case FG_ERR:
+			err( err_msg[0], c, 1 );
+
 		case SX_SPP:
 			parse_pp( &c, fd );
 
@@ -72,6 +78,7 @@ char parse( int fd )
 
 		case FG_NUM:
 			push( &ct, parse_ct( &c, fd ), sizeof(ct_t) );
+
 			push( &st, t, 1 );
 			last=t;
 
@@ -79,7 +86,6 @@ char parse( int fd )
 				goto end;
 
 			goto next_token;
-
 
 		default:
 			if( last==SX_CLP )
@@ -106,9 +112,7 @@ char parse( int fd )
 		case SX_OPB:
 		case SX_OPP:
 		case SX_BLK:
-			if( syntax( &op, t, &last ) ) 
-		case FG_ERR:
-				return c;
+			last=syntax( &op, t, last );
 
 			if( t==SX_CLP || t==SX_CLB || t==SX_BLK )
 				goto end;
@@ -133,8 +137,7 @@ char parse( int fd )
 	c='{'; 
 
 	if( op.i )
-err:
-		return c;
+		err( err_msg[1], '}', 1 );
 
 	return codegen( &st, &ct );
 }

@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdlib.h>
 #define ct_t unsigned long
 
 void write_n( int fd, ct_t n )
@@ -34,12 +35,14 @@ int strlen( char * s )
 unsigned int line, chr;
 unsigned int i, s;
 char buff[0xff];
+char * file;
 
-unsigned int init_err( void )
+unsigned int init_err( char * s )
 {
 	unsigned int r;
 	line=1;
 	chr=0;
+	file=s;
 	return line;
 }
 
@@ -69,9 +72,13 @@ char read_chr( int fd )
 	return c;
 }
 
-void write_err( char * s, char c, char * file )
+void err( char * s, char c, int b )
 {
+	char * type[2] = { "Warning", "Error" };
 	char d[2] = { ':', '\n' };
+
+	write( 2, type[b], strlen(type[b]) );
+	write( 2, d, 1 );
 
 	write( 2, file, strlen(file) );
 	write( 2, d, 1 );
@@ -89,4 +96,7 @@ void write_err( char * s, char c, char * file )
 		write( 2, &c, 1 );
 
 	write( 2, d+1, 1 );
+
+	if( b )
+		exit(1);
 }

@@ -8,6 +8,9 @@ int parse_pp( char * c, int fd )
 	case '!':
 		while( (*c=read_chr(fd))!='\n' )
 			;
+		return 1;
 	}
+
+	err( "No preprocessor directive", *c, 0 );
 	return 1;
 }

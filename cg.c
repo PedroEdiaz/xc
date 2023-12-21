@@ -32,7 +32,7 @@ int optimize( struct stack * st, struct stack * ct )
 err3:
 err2:
 err1:
-	return 0;
+	err( "Unrechable", 0x00, 1 );
 }
 
 int codegen( struct stack * st, struct stack * ct )
@@ -53,12 +53,12 @@ int codegen( struct stack * st, struct stack * ct )
 			goto cont;
 		}
 
-
+#warning	This may not work, but works for me.
 		write( 1, "\t", 1  );
-#warning This may not work, but works for me.
 		write_n( 1, *(ct_t*)&(ct->body[k]) );
-		k+=8;
 		write( 1, "\n", 1  );
+
+		k+=8;
 
 	cont:
 	}

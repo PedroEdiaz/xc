@@ -18,8 +18,8 @@ int assoc( token_t );
 int codegen( struct stack *, struct stack * );
 int optimize( struct stack *, struct stack * );
 
-unsigned int init_err( void );
-void write_err( char *, char, char *  );
+unsigned int init_err( char * );
+void err( char *, char, int );
 void write_n( int fd, int n );
 
 char read_chr( int fd  );

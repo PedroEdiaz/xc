@@ -19,9 +19,6 @@
 	#! Sufix operators
 	70++;
 
-
-
-
 	#! Implementation of increment, adding, and unary add
 	1+(+1);
 	1+ +1;
