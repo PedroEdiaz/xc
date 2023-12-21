@@ -50,8 +50,8 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 	case OP_ALP: return a*b;
 	case OP_ALA: return a+b;
 	case OP_ALS: return a-b;
-	case OP_BWL: return a<<b;
-	case OP_BWR: return a>>b;
+	case OP_BWL: return a>>b;
+	case OP_BWR: return a<<b;
 	case OP_OLW: return a<b;
 	case OP_OGR: return a>b;
 	case OP_OLE: return a<=b;
