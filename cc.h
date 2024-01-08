@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include "st.c"
 
+#define FLAG( t, flag ) ( t<4 && t&flag )
 #define FG_NUM 0b000
 #define FG_SFX 0b001 
 #define FG_POP 0b010 

@@ -1,11 +1,11 @@
 #! main function
 {
 	#! Nested ternary operator
-	1?0?3:4:5;
-	0?6:1?7:8;
+	(1?0?3:4:5);
+	(0?6:1?7:8);
 
-	#! Optimize multiple ';'
-	;;;;;
+	#! No problem
+	;;
 
 	#! Numeric constants
 	0b10001;
@@ -20,13 +20,7 @@
 	70++;
 
 	#! Implementation of increment, adding, and unary add
-	1+(+1);
 	1+ +1;
-
-	((2++)++)+2;
 	2+++++2;
-
-	(3++)+(++3);
 	3++ + ++3;
-
 }

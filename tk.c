@@ -65,7 +65,7 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 	case OP_LGO: return a||b;
 	}
 
-	err( "Unreachable", 0x00, 1 );
+	err( "Unreachable: Eval", 0x00, 1 );
 	return 1;
 }
 

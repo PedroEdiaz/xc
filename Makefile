@@ -1,7 +1,8 @@
-
 BIN = cc
+BKND = irxc
 OBJ = \
-	cg.o \
+	backend/$(BKND).o \
+	op.o \
 	ct.o \
 	pp.o \
 	st.o \
