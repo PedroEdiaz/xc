@@ -1,6 +1,6 @@
 #include "cc.h"
 
-int optimize( struct stack * st, struct stack * ct )
+void optimize( struct stack * st, struct stack * ct )
 {
 	token_t t=pop(st,1);
 	ct_t b,c;
@@ -27,7 +27,7 @@ int optimize( struct stack * st, struct stack * ct )
 	b=eval(t,pop(ct,sizeof(ct_t)),b,c);
 	push( ct, b, sizeof( ct_t) );
 
-	return 1;
+	return;
 
 err3:
 err2:
@@ -63,5 +63,6 @@ int codegen( struct stack * st, struct stack * ct )
 	cont:
 	}
 
+	st->i=ct->i=0;
 	return 0;
 }

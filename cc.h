@@ -7,7 +7,7 @@
 #define FG_POP 0b010 
 #define FG_ERR 0b100 
 
-char parse( int );
+void parse( int );
 
 #define token_t unsigned char
 token_t token( token_t * last, char c );
@@ -16,7 +16,7 @@ int arity( token_t );
 int assoc( token_t );
 
 int codegen( struct stack *, struct stack * );
-int optimize( struct stack *, struct stack * );
+void optimize( struct stack *, struct stack * );
 
 unsigned int init_err( char * );
 void err( char *, char, int );
@@ -25,7 +25,7 @@ void write_n( int fd, int n );
 char read_chr( int fd  );
 
 ct_t parse_ct( char * c, int fd );
-int parse_pp( char * c, int fd );
+void parse_pp( char * c, int fd );
 
 enum
 {

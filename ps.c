@@ -54,7 +54,7 @@ int syntax( struct stack * op , token_t t, token_t last )
 	return FLAG(last, FG_SFX)? FG_NUM: t;
 }
 
-char parse( int fd )
+void parse( int fd )
 {
 	struct stack st={0}, ct= {0}, op={0};
 	token_t t, last=FG_ERR;
@@ -98,8 +98,7 @@ char parse( int fd )
 			while( t && op.i && ( peak(&op)>t || ( peak(&op)==t && !assoc(t) ) ) )
 			{
 				push( &st, pop(&op,1), 1 );
-				if( !(optimize( &st, &ct )) )
-					return '!';
+				optimize( &st, &ct );
 			}
 
 			if( last==SX_OPP )
@@ -120,11 +119,8 @@ char parse( int fd )
 
 			if( t == SX_SMC )
 			{
-				if( peak(&st) == t || !st.i )
-					goto end;
-
-			 	push( &st, t, 1 );
-			 	goto end;
+				codegen( &st, &ct );
+				goto end;
 			}
 
 			push( &op, t, 1 );
@@ -139,5 +135,4 @@ char parse( int fd )
 	if( op.i )
 		err( err_msg[1], '}', 1 );
 
-	return codegen( &st, &ct );
 }
