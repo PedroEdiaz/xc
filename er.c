@@ -1,6 +1,9 @@
-#include <unistd.h>
-#include <stdlib.h>
-#define ct_t unsigned long
+#include "cc.h"
+
+unsigned int line, chr;
+unsigned int i, s;
+char buff[0xff];
+char * file;
 
 void write_n( int fd, ct_t n )
 {
@@ -20,22 +23,6 @@ void write_n( int fd, ct_t n )
 
 	write( fd, buff+i, 0xff-i );
 }
-
-int strlen( char * s )
-{
-	char * p;
-
-	p=s;
-	while( *p )
-		++p;
-
-	return p-s;
-}
-
-unsigned int line, chr;
-unsigned int i, s;
-char buff[0xff];
-char * file;
 
 unsigned int init_err( char * s )
 {

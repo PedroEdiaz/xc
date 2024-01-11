@@ -8,7 +8,6 @@
 #define FG_NUM 0b000
 #define FG_SFX 0b001 
 #define FG_POP 0b010 
-#define FG_ERR 0b100 
 
 #define token_t unsigned char
 
@@ -35,11 +34,14 @@ void parse_pp( char * c, int fd );
 
 enum
 {
-	SX_BLK=5,
+	FG_ERR=4,
+	FG_STR,
+	SX_BLK,
 	SX_SPP,
 	SX_OPB,
 	SX_CLB,
 	SX_OPP,
 	SX_CLP,
 	SX_SMC,
+	RW_RET,
 };

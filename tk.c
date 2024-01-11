@@ -2,7 +2,7 @@
 
 enum 
 {
-	OP_ASG=12,
+	OP_ASG=14,
 	OP_TRN,
 	OP_LGO,
 	OP_LGA,
@@ -89,6 +89,8 @@ int arity( token_t t )
 	case OP_BWN:
 	case OP_LGN: 
 		return 1;
+	case RW_RET:
+		return 0;
 	}
 	return 2;
 }
@@ -97,6 +99,9 @@ token_t token( token_t * last, char c )
 {
 	if( '0' <= c && c <= '9' )
 		return (*last)?FG_NUM:FG_ERR;
+
+	if( 'a' <= c && c <= 'z' )
+		return FG_STR;
 
 	switch( c )
 	{
@@ -181,5 +186,20 @@ token_t token( token_t * last, char c )
 	}
 	
 	err( "No token match", c, 1 );
-	return 1;
+	return FG_ERR;
+}
+
+token_t token_str( token_t * last, char * str )
+{
+	if( !strcmp( str, "return" ) )
+	{
+		if( *last == FG_ERR )
+		{
+			return RW_RET;
+		}
+		return FG_ERR;
+	}
+
+	err( str, 0x00, 1 );
+	return FG_ERR;
 }

@@ -31,14 +31,10 @@ void parse_pp( char * c, int fd )
 	str = parse_va( c, fd );
 
 	if( !strcmp( str, "warning" ) )
-	{
 		return trow( c, fd, 0 );	
-	}
 
 	if( !strcmp( str, "error" ) )
-	{
 		return trow( c, fd, 1 );	
-	}
 
 	err( "No preprocessor directive", *c, 0 );
 	return;
