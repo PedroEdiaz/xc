@@ -4,8 +4,6 @@ OBJ = \
 	backend/$(BKND).o \
 	op.o \
 	ct.o \
-	va.o \
-	pp.o \
 	st.o \
 	ps.o \
 	tk.o \

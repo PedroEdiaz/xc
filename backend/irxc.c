@@ -6,7 +6,7 @@ int codegen( struct stack * st, struct stack * ct )
 	{
 		char t;
 
-		if(  t=unqueue(st,1) )
+		if(  (t=unqueue(st,1))!=FG_NUM )
 		{
 			write_n( 1, t );
 			goto cont;

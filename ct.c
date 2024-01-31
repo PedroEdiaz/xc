@@ -1,44 +1,44 @@
 #include "cc.h"
 
-ct_t parse_ct( char * c, int fd )
+ct_t parse_ct( char * s )
 {
 	char base=10;
 	ct_t res=0;
 
-	if( *c=='0' )
+	if( *s=='0' )
 	{
-		*c=read_chr(fd);
+		++s;
 
-		switch( *c )
+		switch( *s )
 		{
 		case 'b':
 			base=2;
-			*c=read_chr(fd);
+			++s;
 			goto end;
 		case 'x':
 			base=16;
-			*c=read_chr(fd);
+			++s;
 			goto hex;
 		}
 		base=8;
 	end:
 	}
 
-	while( '0'<=*c &&  *c<='0'+base-1 )
+	while( '0'<=*s &&  *s<='0'+base-1 )
 	{
 		res *= base;
-		res += *c-'0';
-		*c=read_chr(fd);
+		res += *s-'0';
+		++s;
 	}
 
 	return  res;
-
 hex:
-	while( ('0'<=*c&&*c<='9') || ('a'<=*c&&*c<='f') )
+	while( ('0'<=*s&&*s<='9') || ('a'<=*s&&*s<='f') )
 	{
 		res *= base;
-		res += ('a'<=*c&&*c<='f')?*c-'a'+10:*c-'0';
-		*c=read_chr(fd);
+		res += ('0'<=*s&&*s<='f')?*s-'a'+10:*s-'0';
+		++s;
 	}
+
 	return  res;
 }

@@ -1,50 +1,26 @@
-A compiler for a C dialect
-==========================
+XC
+==
+A toy self-compiling C compiler.
 
-Accomplish
-----------
-* Working C-like syntatic symbols: '{', '}', ';', '(', ')'.
-* All C operators.
-* Syntax Check.
-* Simple code generator, for an abstract stack machine.
-* Simple optimization, by pushing down the stack.
+Rodemap
+-------
+ *	Tokenize C source
+ *	Clean and upgradable code
+ *	Optimization
+ 	 *	Constant folding
+ 	 x	Deadcode elimination
+ 	 _	Constant Propagation
+ *	Integers
+	 *	Operators
+	 *	Constants
+	 _	Variables
+ *	Return
+ _	Gotos
+ _	If
+ _	While
+ _	Functions
+
 
 Compile and test
 ----------------
 	make; ./cc TEST.c
-
-Objectives
-----------
-* Use zig-like types: i8, u8, ... , i64, u64.
-* All keywords avoided by the style-guide must not be implemented.
-* All variables may be "static" and "volatile".
-* Compile options to force style-guide (+) at compile time.
-
-Style-guide
------------
-+ Use snake_case when nameing variables or functions.
-+ Indent with tabs in Allman style.
-+ Declare variables at the top of the scope.
-+ Only use Upercase for enums and preprocesor definitions.
-+ use lowercase in every other case.
-* Use syscalls instead of libc.
-* Try using the preprocesor insted of:
-	* enums
-* Use the preprocesor insted of:
-	* inline
-	* typedef
-* Use "goto" and "while" insted of:
-	* for
-	* do
-	* else
-	* break
-	* continue
-* Use pointers instead of variable modifier like:
-	* const
-	* volatile
-	* register
-	* extern
-	* static
-* Consider harmfull and avoid:
-	* auto
-	* unions

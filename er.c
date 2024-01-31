@@ -5,7 +5,7 @@ unsigned int i, s;
 char buff[0xff];
 char * file;
 
-void write_n( int fd, ct_t n )
+void write_n( fd_t fd, ct_t n )
 {
 	unsigned char buff[0xff], i=0xff-1;
 
@@ -33,7 +33,7 @@ unsigned int init_err( char * s )
 	return line;
 }
 
-char read_chr( int fd )
+char read_chr( fd_t fd )
 {
 	char c;
 
@@ -44,7 +44,7 @@ char read_chr( int fd )
 	}
 
 	if( !s )
-		return 0xff;
+		return 0x00;
 
 	c=buff[i];
 	++i;
@@ -59,7 +59,7 @@ char read_chr( int fd )
 	return c;
 }
 
-void err( char * s, char c, int b )
+void err( char * s, char * w, int b )
 {
 	char * type[2] = { "Warning", "Error" };
 	char d[2] = { ':', '\n' };
@@ -79,8 +79,8 @@ void err( char * s, char c, int b )
 	write( 2, s, strlen(s) );
 	write( 2, d, 1 );
 
-	if( c )
-		write( 2, &c, 1 );
+	if( w )
+		write( 2, w, strlen(w) );
 
 	write( 2, d+1, 1 );
 

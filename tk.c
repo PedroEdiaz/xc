@@ -1,9 +1,11 @@
 #include "cc.h"
 
+
 enum 
 {
-	OP_ASG=14,
+	OP_ASG=SX_LAST,
 	OP_TRN,
+	OP_TRD,
 	OP_LGO,
 	OP_LGA,
 	OP_BWO,
@@ -30,7 +32,144 @@ enum
 	OP_INS, 
 	OP_UNS,
 	OP_UNA,
+	OP_LAST
 };
+
+const token_t op_trn = OP_TRN;
+
+char * sym[] =
+{
+	[SX_OPB]="{",
+	[SX_CLB]="}",
+	[SX_OPP]="(",
+	[SX_CLP]=")",
+	[SX_SMC]=";",
+	[KW_RETURN]="return",
+	[SX_LAST]=NULL,
+
+	[OP_ASG]="=",
+	[OP_TRN]="?",
+	[OP_TRD]=":",
+	[OP_LGO]="||",
+	[OP_LGA]="&&",
+	[OP_BWO]="|",
+	[OP_BWX]="^",
+	[OP_BWA]="&",
+	[OP_ONE]="!=",
+	[OP_OEQ]="==",
+	[OP_OGE]=">=",
+	[OP_OLE]="<=",
+	[OP_OGR]=">",
+	[OP_OLW]="<",
+	[OP_BWR]=">>",
+	[OP_BWL]="<<",
+	[OP_ALS]="-",
+	[OP_ALA]="+",
+	[OP_ALP]="*",
+	[OP_ALM]="%",
+	[OP_ALD]="/",
+
+	[OP_LGN]="!",
+	[OP_BWN]="~",
+
+	[OP_DES]="--",
+	[OP_INS]="++",
+	[OP_DEP]=NULL,
+	[OP_INP]=NULL, 
+	[OP_UNS]=NULL,
+	[OP_UNA]=NULL,
+};
+
+token_t syntax( token_t last, token_t * tk )
+{
+	switch( *tk )
+	{
+	case KW_RETURN:
+		return (last==FG_ERR )? *tk: FG_EOF;
+	case FG_NUM:
+		return (last==FG_NUM)?FG_EOF:*tk;
+	case SX_OPP:
+		return (last==FG_NUM)?FG_EOF:*tk;
+	case SX_CLP:
+		return (last==FG_NUM)?FG_NUM:FG_EOF;
+	case SX_OPB:
+		return (last==FG_ERR)?FG_ERR:FG_EOF;
+	case SX_CLB:
+		return (last==FG_ERR)?FG_ERR:FG_EOF;
+
+
+	case SX_SMC:
+		switch( last )
+		{
+		case FG_ERR:
+		case KW_RETURN:
+			return FG_ERR;
+		}
+
+		return (last==FG_NUM)?FG_ERR:FG_EOF;
+
+	case OP_TRD:
+		*tk=SX_CLP;
+		return OP_TRD;
+		
+	case OP_INS:
+		if( last!=FG_NUM )
+			return *tk=OP_INP;
+	case OP_DES:
+		if( last!=FG_NUM )
+			return *tk=OP_DEP;
+		return FG_NUM;
+	case OP_ALA:
+		if( last!=FG_NUM )
+			return *tk=OP_UNA;
+	case OP_ALS:
+		if( last!=FG_NUM )
+			return *tk=OP_UNS;
+	}
+
+	return (last==FG_NUM)?*tk:FG_EOF;
+}
+
+token_t token( char * s, unsigned char l ) 
+{
+	static token_t last=FG_ERR;
+	unsigned char i=SX_START;
+
+	s[l]=0x00;
+
+	if( l==1 & *s<=' ' )
+		return FG_BLK;
+
+	if( '0' <= *s && *s<='9' )
+	{
+		i=FG_NUM;
+		goto end;
+	}
+
+	if( *s=='\'' )
+		return FG_NUM;
+
+	while( i < OP_LAST )
+	{
+		if( !sym[i] )
+			goto next;
+
+		if( !strcmp( s, sym[i] ) )
+			goto end;
+	next:
+		++i;
+	}
+
+	err( "Token not found", s, 1 );
+
+end:
+	last = syntax(last, &i );
+
+	if( last == FG_EOF )
+		return FG_ERR;
+
+	return i;
+}
 
 ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 {
@@ -39,12 +178,6 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 	case OP_TRN: return a?b:c;
 	case OP_DES: return a--;
 	case OP_INS: return a++;
-	case OP_UNA: return +a;
-	case OP_UNS: return -a;
-	case OP_INP: return ++a;
-	case OP_DEP: return --a;
-	case OP_BWN: return ~a;
-	case OP_LGN: return !a;
 	case OP_ALD: return a/b;
 	case OP_ALM: return a%b;
 	case OP_ALP: return a*b;
@@ -63,6 +196,13 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 	case OP_BWX: return a^b;
 	case OP_LGA: return a&&b;
 	case OP_LGO: return a||b;
+
+	case OP_UNA: return +a;
+	case OP_UNS: return -a;
+	case OP_INP: return ++a;
+	case OP_DEP: return --a;
+	case OP_BWN: return ~a;
+	case OP_LGN: return !a;
 	}
 
 	err( "Unreachable: Eval", 0x00, 1 );
@@ -89,117 +229,77 @@ int arity( token_t t )
 	case OP_BWN:
 	case OP_LGN: 
 		return 1;
-	case RW_RET:
+	case KW_RETURN:
 		return 0;
 	}
 	return 2;
 }
 
-token_t token( token_t * last, char c )
+char is_alfnum( char c )
 {
-	if( '0' <= c && c <= '9' )
-		return (*last)?FG_NUM:FG_ERR;
-
-	if( 'a' <= c && c <= 'z' )
-		return FG_STR;
-
-	switch( c )
-	{
-	case '?': 
-		if( *last )
-		{
-			return FG_ERR;
-		}
-		*last=SX_OPP; return OP_TRN;
-	case ':': 
-		if( *last )
-		{
-			return FG_ERR;
-		}
-		*last=SX_CLP; return OP_TRN;
-	case '/': return ( !*last )?OP_ALD:FG_ERR;
-	case '%': return ( !*last )?OP_ALM:FG_ERR;
-	case '*': return ( !*last )?OP_ALP:FG_ERR;
-	case '^': return ( !*last )?OP_BWX:FG_ERR;
-	case '!': return ( *last )?OP_LGN:FG_ERR;
-	case '~': 
-		switch( *last )
-		{
-		case FG_NUM: return FG_ERR;
-		case OP_BWN: *last=FG_POP; return FG_POP;
-		}
-		return OP_BWN;
- 	case '>':
-		switch( *last )
-		{
-		case FG_NUM: return OP_OLW;
-		case OP_OLW: *last=FG_POP; return OP_BWL;
-		}
-		return FG_ERR;
-	case '<':
-		switch( *last )
-		{
-		case FG_NUM: return OP_OGR;
-		case OP_OGR: *last=FG_POP; return OP_BWR;
-		}
-		return FG_ERR;
-	case '&':
-		switch( *last )
-		{
-		case FG_NUM: return OP_BWA;
-		case OP_BWA: *last=FG_POP; return OP_LGA;
-		}
-		return FG_ERR;
-	case '|':
-		switch( *last )
-		{
-		case FG_NUM: return OP_BWO;
-		case OP_BWO: *last=FG_POP; return OP_LGO;
-		}
-		return FG_ERR;
-	case '=': 
-		switch( *last )
-		{
-		case FG_NUM: return OP_ASG;
-		case OP_ASG: *last=FG_POP; return OP_OEQ;
-		case OP_LGN: *last=FG_POP; return OP_ONE; 
-		case OP_OGR: *last=FG_POP; return OP_OGE;
-		case OP_OLW: *last=FG_POP; return OP_OLE;
-		}
-		return FG_ERR;
-	case '+':
-		switch( *last )
-		{
-		case FG_NUM: return OP_ALA;
-		case OP_UNA: *last=FG_POP; return OP_INP;
-		case OP_ALA: *last=FG_POP|FG_SFX; return OP_INS;
-		}
-		return OP_UNA;
-	case '-': 
-		switch( *last )
-		{
-		case FG_NUM: return OP_ALS;
-		case OP_UNS: *last=FG_POP; return OP_DEP;
-		case OP_ALS: *last=FG_POP|FG_SFX; return OP_DES;
-		}
-		return OP_UNS;
-	}
-	
-	err( "No token match", c, 1 );
-	return FG_ERR;
+	return  c=='_' | 
+		( 'a' <= c & c <= 'z' ) |
+		( 'A' <= c & c <= 'Z' ) |
+		( '0' <= c & c <= '9' ) ; 
 }
 
-token_t token_str( token_t * last, char * str )
+char is_delim( char c )
 {
-	if( !strcmp( str, "return" ) )
+	return c=='\'' | c=='"';
+}
+
+char may_twice( char c )
+{
+	return c=='+' | c=='-' | 
+		c=='<' | c=='>' |
+		c=='&' | c=='|' ; 
+
+}
+
+char may_equal( char c )
+{
+	return may_twice(c) 
+		| c=='!' | c=='=' 
+		| c=='*' | c=='/' 
+		| c=='%' | c=='^' ;
+}
+
+token_t tokenize( fd_t fd, char * p, char * s )
+{
+	static char c=0;
+	unsigned char i=0;
+
+	char cond;
+
+	if( c )
+		goto cont;
+
+next:
+	if( !(c=read_chr(fd)) )
+		return FG_EOF;
+
+cont:
+	if( i==*s-1 )
+		p=realloc(p,++*s);
+
+	cond = !i;
+	cond |= is_alfnum(*p) & is_alfnum(c);
+	cond |= i==1 & may_twice(c) & *p==c;
+	cond |= may_equal(*p) & c=='=';
+	cond |= is_delim(*p) & (*p!=c | (p[i-1]=='\\' & p[i-2]!='\\')) ;
+
+	if( cond )
 	{
-		if( *last == FG_ERR )
-		{
-			return RW_RET;
-		}
-		return FG_ERR;
+		p[i++]=c;
+		goto next;
 	}
 
-	err( str, 0x00, 1 );
-	return FG_ERR;
+	if( is_delim(*p) & *p==c )
+	{
+		p[i++]=c;
+		c=0;
+		return token(p,i);
+	}
+
+	return token(p,i);
 }

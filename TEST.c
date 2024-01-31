@@ -1,12 +1,7 @@
-#! main
 {
-	;;
-	#! Dead code 
-	1?0?3:4:5;
+	(3+4)*5;
+	;
+	return 0?1:2;
 
-	#! Return;
-	return 3;
-
-	#! Dead code
-	return ;
-}
+	return;
+} 

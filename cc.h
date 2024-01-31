@@ -4,16 +4,13 @@
 #include <string.h>
 #include "st.c"
 
-#define FLAG( t, flag ) ( t<FG_ERR && t&flag )
-#define FG_NUM 0b000
-#define FG_SFX 0b001 
-#define FG_POP 0b010 
-
 #define token_t unsigned char
+#define fd_t unsigned char
+
+extern const token_t op_trn;
 
 void parse( int );
 
-token_t token( token_t * last, char c );
 token_t token_str( token_t * last, char * str );
 ct_t eval( token_t, ct_t, ct_t, ct_t );
 int arity( token_t );
@@ -23,25 +20,29 @@ int codegen( struct stack *, struct stack * );
 void optimize( struct stack *, struct stack * );
 
 unsigned int init_err( char * );
-void err( char *, char, int );
-void write_n( int fd, ct_t n );
+void err( char *, char *, int );
+void write_n( fd_t, ct_t );
 
-char read_chr( int fd  );
 
-ct_t parse_ct( char * c, int fd );
-char * parse_va( char * c, int fd );
-void parse_pp( char * c, int fd );
+char read_chr( fd_t  );
+
+ct_t parse_ct( char * );
 
 enum
 {
-	FG_ERR=4,
-	FG_STR,
-	SX_BLK,
-	SX_SPP,
+	FG_EOF,
+	FG_ERR,
+	FG_BLK,
+	FG_NUM,
+
+	SX_START,
+
 	SX_OPB,
 	SX_CLB,
 	SX_OPP,
 	SX_CLP,
 	SX_SMC,
-	RW_RET,
+	KW_RETURN,
+
+	SX_LAST
 };
