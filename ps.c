@@ -33,14 +33,31 @@ void parse( int fd )
 	{
 		switch( tk=token(s) )
 		{
+		case SX_CLC:
+			err( err_msg_ps[1], "/*", 1 );
 		case FG_ERR:
 			err( err_msg_ps[0], s, 1 );
 		case FG_EOF:
 			goto end;
 
-		case FG_TPP:
+		case SX_TPP:
 			parse_pp( fd );
 			goto next;
+
+		case SX_OPC:
+			while( (s=tokenize(fd)) && tk!=SX_CLC )
+				tk=token(s);
+
+			if( !s )
+				err( err_msg_ps[1], "*/", 1 );
+
+			goto next;
+
+		case SX_SNC:
+			while( read_chr(fd) !='\n' )
+				;
+			goto next;
+
 		case FG_NUM:
 			push( &ct, parse_ct(s), sizeof(ct_t) );
 			push( &st, tk, 1 );

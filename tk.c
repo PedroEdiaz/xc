@@ -1,6 +1,5 @@
 #include "cc.h"
 
-
 enum 
 {
 	OP_ASG=SX_LAST,
@@ -39,7 +38,10 @@ const token_t op_trn = OP_TRN;
 
 char * sym[] =
 {
-	[FG_TPP]="#",
+	[SX_TPP]="#",
+	[SX_OPC]="/*",
+	[SX_CLC]="*/",
+	[SX_SNC]="//",
 	[SX_OPB]="{",
 	[SX_CLB]="}",
 	[SX_OPP]="(",
@@ -85,8 +87,12 @@ token_t syntax( token_t last, token_t * tk )
 {
 	switch( *tk )
 	{
-	case FG_TPP:
+	case SX_TPP:
 		return FG_ERR;
+	case SX_OPC:
+	case SX_CLC:
+	case SX_SNC:
+		return last;
 
 	case KW_RETURN:
 		return (last==FG_ERR )? *tk: FG_EOF;
@@ -100,7 +106,6 @@ token_t syntax( token_t last, token_t * tk )
 		return (last==FG_ERR)?FG_ERR:FG_EOF;
 	case SX_CLB:
 		return (last==FG_ERR)?FG_ERR:FG_EOF;
-
 
 	case SX_SMC:
 		switch( last )
@@ -162,7 +167,7 @@ token_t token( char * s )
 		++i;
 	}
 
-	err( "Token not found", s, 1 );
+	return FG_ERR;
 
 end:
 	last = syntax(last, &i );
@@ -254,6 +259,7 @@ char may_twice_equal( char c )
 {
 	return c=='<' | c=='>' ;
 }
+
 char may_twice( char c )
 {
 	return may_twice_equal(c) |
@@ -290,9 +296,21 @@ cont:
 
 	cond = !i;
 	cond |= is_alfnum(*p) & is_alfnum(c);
-	cond |= i==1 & may_twice(c) & *p==c;
-	cond |= i==1 & may_equal(*p) & c=='=';
-	cond |= i==2 & may_twice_equal(*p) & c=='=';
+
+	switch( i * !cond )
+	{
+	case 2:
+		cond |= may_twice_equal(*p) & c=='=';
+		goto end;
+	case 1:
+		cond |= *p=='/' & c=='/';
+		cond |= *p=='/' & c=='*';
+		cond |= *p=='*' & c=='/';
+		cond |= may_twice(c) & *p==c;
+		cond |= may_equal(*p) & c=='=';
+	end:
+	}
+
 	cond |= is_delim(*p) & (*p!=c | (p[i-1]=='\\' & p[i-2]!='\\')) ;
 
 	if( cond )

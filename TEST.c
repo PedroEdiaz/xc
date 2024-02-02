@@ -1,5 +1,6 @@
-#warning This is a warning
-
+#warning this is a warning
+/* This is a coment */
+// and this is another coment
 {
 	(3+4)*5;
 	;

@@ -38,7 +38,10 @@ enum
 
 	SX_START,
 
-	FG_TPP,
+	SX_TPP,
+	SX_OPC,
+	SX_CLC,
+	SX_SNC,
 
 	SX_OPB,
 	SX_CLB,
