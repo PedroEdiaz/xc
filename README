@@ -2,19 +2,21 @@ XC
 ==
 A toy self-compiling C compiler.
 
-Known bugs
-----------
- *	"#" may not be at the beginning of a file
-
 Rodemap
 -------
  *	Tokenize C source
  *	Clean and upgradable code
- *	Optimization
+ x	Optimization
  	 *	Constant folding
  	 x	Deadcode elimination
  	 _	Constant Propagation
- *	Integers
+ x 	Preprocesor
+ 	 * 	Warning
+ 	 * 	Error
+ 	 _	Define
+ 	 _	Ifdef
+ 	 _	Include
+ x	Integers
 	 *	Operators
 	 *	Constants
 	 _	Variables
@@ -23,7 +25,6 @@ Rodemap
  _	If
  _	While
  _	Functions
-
 
 Compile and test
 ----------------

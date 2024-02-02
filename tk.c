@@ -38,7 +38,7 @@ const token_t op_trn = OP_TRN;
 
 char * sym[] =
 {
-	[SX_TPP]="#",
+	[SX_TPP]="\n#",
 	[SX_OPC]="/*",
 	[SX_CLC]="*/",
 	[SX_SNC]="//",
@@ -144,7 +144,7 @@ token_t token( char * s )
 	static token_t last=FG_ERR;
 	unsigned char i=SX_START;
 
-	if( *s<=' ' )
+	if( *s<=' ' & !*(s+1) )
 		return FG_BLK;
 
 	if( '0' <= *s && *s<='9' )
@@ -212,7 +212,7 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 	case OP_LGN: return !a;
 	}
 
-	err( "Unreachable: Eval", 0x00, 1 );
+	err( "Unreachable", "Eval", 1 );
 	return 1;
 }
 
@@ -291,6 +291,12 @@ next:
 		return FG_EOF;
 
 cont:
+	if( !p & c=='#' )
+	{
+		c=0;
+		return  "\n#";
+	}
+
 	if( i==s-1 | !p )
 		p=realloc(p,++s);
 
@@ -303,6 +309,7 @@ cont:
 		cond |= may_twice_equal(*p) & c=='=';
 		goto end;
 	case 1:
+		cond |= *p=='\n' & c=='#';
 		cond |= *p=='/' & c=='/';
 		cond |= *p=='/' & c=='*';
 		cond |= *p=='*' & c=='/';
