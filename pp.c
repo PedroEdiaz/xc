@@ -1,41 +1,32 @@
 #include "cc.h"
 
-void trow( char * c, int fd, int b )
+void trow( int fd, int b )
 {
 	unsigned int i=0;
 	char buff[255];
 
-	while( (*c=read_chr(fd))!='\n' )
-	{
-		buff[i]=*c;
+	while( (buff[i]=read_chr(fd))!='\n' )
 		++i;
-	}
+
 	buff[i]=0x00;
-	err( buff, 0x00, b );
-	return;
+	return err( "Preprocesor", buff, b );
 }
 
-void parse_pp( char * c, int fd )
+void parse_pp( int fd )
 {
-	char * str;
-	*c=read_chr(fd);
+	char *str, c;
 
-	switch( *c )
-	{
-	case '!':
-		while( (*c=read_chr(fd))!='\n' )
-			;
-		return; 
-	}
-
-	str = parse_va( c, fd );
+	str = tokenize( fd );
 
 	if( !strcmp( str, "warning" ) )
-		return trow( c, fd, 0 );	
+		return trow( fd, 0 );	
 
 	if( !strcmp( str, "error" ) )
-		return trow( c, fd, 1 );	
+		return trow( fd, 1 );	
 
-	err( "No preprocessor directive", *c, 0 );
+	while( read_chr(fd)!='\n' )
+		;
+
+	err( "No preprocessor directive", str, 0 );
 	return;
 }

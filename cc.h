@@ -38,6 +38,8 @@ enum
 
 	SX_START,
 
+	FG_TPP,
+
 	SX_OPB,
 	SX_CLB,
 	SX_OPP,

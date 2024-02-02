@@ -39,6 +39,7 @@ const token_t op_trn = OP_TRN;
 
 char * sym[] =
 {
+	[FG_TPP]="#",
 	[SX_OPB]="{",
 	[SX_CLB]="}",
 	[SX_OPP]="(",
@@ -84,6 +85,9 @@ token_t syntax( token_t last, token_t * tk )
 {
 	switch( *tk )
 	{
+	case FG_TPP:
+		return FG_ERR;
+
 	case KW_RETURN:
 		return (last==FG_ERR )? *tk: FG_EOF;
 	case FG_NUM:

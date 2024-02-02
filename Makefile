@@ -8,6 +8,7 @@ OBJ = \
 	ps.o \
 	tk.o \
 	er.o \
+	pp.o \
 	cc.o
 
 $(BIN): $(OBJ)

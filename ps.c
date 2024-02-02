@@ -28,7 +28,7 @@ void parse( int fd )
 	token_t tk;
 	char * s;
 
-	next:
+ 	next:
 	while( s=tokenize(fd) )
 	{
 		switch( tk=token(s) )
@@ -38,6 +38,9 @@ void parse( int fd )
 		case FG_EOF:
 			goto end;
 
+		case FG_TPP:
+			parse_pp( fd );
+			goto next;
 		case FG_NUM:
 			push( &ct, parse_ct(s), sizeof(ct_t) );
 			push( &st, tk, 1 );
