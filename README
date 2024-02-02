@@ -4,7 +4,6 @@ A toy self-compiling C compiler.
 
 Known bugs
 ----------
- * 	Bad tokenization of "++=="
  *	"#" may not be at the beginning of a file
 
 Rodemap

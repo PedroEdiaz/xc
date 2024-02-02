@@ -243,23 +243,27 @@ char is_alfnum( char c )
 
 char is_delim( char c )
 {
-	return c=='\'' | c=='"';
+	return c=='\'' | c=='"' ;
 }
 
+char may_twice_equal( char c )
+{
+	return c=='<' | c=='>' ;
+}
 char may_twice( char c )
 {
-	return c=='+' | c=='-' | 
-		c=='<' | c=='>' |
+	return may_twice_equal(c) |
+		c=='+' | c=='-' | 
 		c=='&' | c=='|' ; 
 
 }
 
 char may_equal( char c )
 {
-	return may_twice(c) 
-		| c=='!' | c=='=' 
-		| c=='*' | c=='/' 
-		| c=='%' | c=='^' ;
+	return may_twice(c) | 
+		c=='!' | c=='=' |
+		c=='*' | c=='/' | 
+		c=='%' | c=='^' ;
 }
 
 char * tokenize( fd_t fd )
@@ -284,6 +288,7 @@ cont:
 	cond |= is_alfnum(*p) & is_alfnum(c);
 	cond |= i==1 & may_twice(c) & *p==c;
 	cond |= i==1 & may_equal(*p) & c=='=';
+	cond |= i==2 & may_twice_equal(*p) & c=='=';
 	cond |= is_delim(*p) & (*p!=c | (p[i-1]=='\\' & p[i-2]!='\\')) ;
 
 	if( cond )
