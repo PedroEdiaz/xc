@@ -130,14 +130,12 @@ token_t syntax( token_t last, token_t * tk )
 	return (last==FG_NUM)?*tk:FG_EOF;
 }
 
-token_t token( char * s, unsigned char l ) 
+token_t token( char * s ) 
 {
 	static token_t last=FG_ERR;
 	unsigned char i=SX_START;
 
-	s[l]=0x00;
-
-	if( l==1 & *s<=' ' )
+	if( *s<=' ' )
 		return FG_BLK;
 
 	if( '0' <= *s && *s<='9' )
@@ -264,9 +262,9 @@ char may_equal( char c )
 		| c=='%' | c=='^' ;
 }
 
-token_t tokenize( fd_t fd, char * p, char * s )
+char * tokenize( fd_t fd )
 {
-	static char c=0;
+	static char c=0,s=0, *p=NULL;
 	unsigned char i=0;
 
 	char cond;
@@ -279,13 +277,13 @@ next:
 		return FG_EOF;
 
 cont:
-	if( i==*s-1 )
-		p=realloc(p,++*s);
+	if( i==s-1 | !p )
+		p=realloc(p,++s);
 
 	cond = !i;
 	cond |= is_alfnum(*p) & is_alfnum(c);
 	cond |= i==1 & may_twice(c) & *p==c;
-	cond |= may_equal(*p) & c=='=';
+	cond |= i==1 & may_equal(*p) & c=='=';
 	cond |= is_delim(*p) & (*p!=c | (p[i-1]=='\\' & p[i-2]!='\\')) ;
 
 	if( cond )
@@ -298,8 +296,10 @@ cont:
 	{
 		p[i++]=c;
 		c=0;
-		return token(p,i);
+		p[i]=0x00;
+		return p;
 	}
 
-	return token(p,i);
+	p[i]=0x00;
+	return p;
 }

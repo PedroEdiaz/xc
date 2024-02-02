@@ -27,23 +27,21 @@ void parse( int fd )
 
 	token_t tk;
 	char * s;
-	unsigned char l=1;
-
-	s=malloc(1);
 
 	next:
-	while( (tk=tokenize(fd, s, &l )) != FG_EOF )
+	while( s=tokenize(fd) )
 	{
-		switch( tk )
+		switch( tk=token(s) )
 		{
 		case FG_ERR:
 			err( err_msg_ps[0], s, 1 );
+		case FG_EOF:
+			goto end;
 
 		case FG_NUM:
 			push( &ct, parse_ct(s), sizeof(ct_t) );
 			push( &st, tk, 1 );
 			goto next;
-
 
 		default:
 			while( !isempty(&op) && 
@@ -82,6 +80,7 @@ void parse( int fd )
 		case FG_BLK:
 		}
 	}
+end:
 
 	if( !isempty(&op) )
 		err( err_msg_ps[1], "}", 1 );

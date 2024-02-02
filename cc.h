@@ -11,8 +11,9 @@ extern const token_t op_trn;
 
 void parse( int );
 
-token_t token_str( token_t * last, char * str );
+token_t token( char * s );
 ct_t eval( token_t, ct_t, ct_t, ct_t );
+char * tokenize( fd_t fd );
 int arity( token_t );
 int assoc( token_t );
 
