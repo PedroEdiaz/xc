@@ -1,82 +1,64 @@
 #define ct_t unsigned long
-#define isempty( s ) (((s)->i)==((s)->j))
-#define isfull( s, size ) (((s)->i)+size==((s)->j))
-#define queue( s, size ) push( s, size )
 
 struct stack
 {
-	unsigned char i,j;
-	unsigned char body[0xff];
+	struct stack *prev, *root;
+	ct_t value;
 };
-ct_t unqueue( struct stack * s , char size );
-void push( struct stack * s,  ct_t val, char size );
 
-ct_t pop( struct stack * s , char size );
+void push( struct stack ** s,  ct_t val );
+
+char isempty( struct stack * s );
+ct_t pop( struct stack ** s );
 ct_t peek( struct stack * s );
 
 #ifdef IMPLEMENT
+#include <stdlib.h>
 
-void err( char *, char, char );
-char * err_msg_st[2] = {"Unreachable: Empty stack", "No space in stack"};
+void err( char *, char *, char );
 
-void push( struct stack * s, ct_t val, char size )
+char isempty( struct stack * s )
 {
-	if( isfull(s,size) )
-		err( err_msg_st[1] , 0x00, 1 );
-
-	while( size )
-	{
-		s->body[(s->i)++]=val;
-		val>>=8;
-		--size;
-	}
+	return !s;
 }
 
-ct_t unqueue( struct stack * s, char size )
+void push( struct stack ** s, ct_t val )
 {
-	char aux;
-	ct_t res=0;
+	struct stack * p=malloc(sizeof(struct stack));
 
-	if( isempty(s) )
-		err( err_msg_st[1] , 0x00, 1 );
+	p->prev=*s;
+	p->value=val;
 
-	aux=(s->j+=size);
 
-	while( size )
+	if( isempty( *s ) )
 	{
-		res<<=8;
-		res+=s->body[--(s->j)];
-		--size;
+		p->root=p;
+		goto skip;
 	}
 
-	s->j=aux;
-
-	return res;
+	p->root=(*s)->root;
+skip:
+	*s=p;
+	return;
 }
 
-ct_t pop( struct stack * s,  char size )
+ct_t pop( struct stack ** s )
 {
-	ct_t res=0;
+	struct stack * p;
+	ct_t res;
 
-	if( isempty( s ) )
-		err( err_msg_st[0] , 0x00, 1 );
+	res=(*s)->value;
+	p=(*s)->prev;
 
-	while( size )
-	{
-		res<<=8;
-		res+=s->body[--(s->i)];
-		--size;
-	}
-
+	free(*s);
+	*s=p;
+	
 	return res;
 }
 
 ct_t peek( struct stack * s )
 {
-	if( isempty( s ) )
-		err( err_msg_st[0] , 0x00, 0 );
-
-	return s->body[(s->i)-1];
+	return s->value;
 }
 
 #endif

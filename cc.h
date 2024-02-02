@@ -17,8 +17,8 @@ char * tokenize( fd_t fd );
 int arity( token_t );
 int assoc( token_t );
 
-int codegen( struct stack *, struct stack * );
-void optimize( struct stack *, struct stack * );
+int codegen( struct stack **, struct stack ** );
+void optimize( struct stack **, struct stack ** );
 
 unsigned int init_err( char * );
 void err( char *, char *, int );

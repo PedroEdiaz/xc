@@ -2,9 +2,9 @@
 /* This is a coment */
 // and this is another coment
 {
-	(3+4)*5;
+	(30+40)*50;
 	;
-	return 0?1:7;
+	return 30?40:50;
 
 	return;
 } 

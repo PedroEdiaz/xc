@@ -4,8 +4,6 @@ A toy self-compiling C compiler.
 
 Rodemap
 -------
- *	Tokenize C source
- *	Clean and upgradable code
  x	Optimization
  	 *	Constant folding
  	 x	Deadcode elimination
@@ -20,6 +18,11 @@ Rodemap
 	 *	Operators
 	 *	Constants
 	 _	Variables
+ _	Floats
+	 _	Operators
+	 _	Constants
+	 _	Variables
+ *	Comments
  *	Return
  _	Gotos
  _	If

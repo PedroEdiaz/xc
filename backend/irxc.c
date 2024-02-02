@@ -1,19 +1,19 @@
 #include "../cc.h"
 
-int codegen( struct stack * st, struct stack * ct )
+int codegen( struct stack ** st, struct stack ** ct )
 {
-	while( !isempty(st) )
+	while( !isempty(*st) )
 	{
 		char t;
 
-		if(  (t=unqueue(st,1))!=FG_NUM )
+		if(  (t=pop(st))!=FG_NUM )
 		{
 			write_n( 1, t );
 			goto cont;
 		}
 
 		write( 1, "\t", 1  );
-		write_n( 1, unqueue(ct,8) );
+		write_n( 1, pop(ct) );
 	cont:
 		write( 1, "\n", 1  );
 	}

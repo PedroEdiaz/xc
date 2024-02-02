@@ -309,12 +309,12 @@ cont:
 		cond |= may_twice_equal(*p) & c=='=';
 		goto end;
 	case 1:
+		cond |= may_twice(c) & *p==c;
+		cond |= may_equal(*p) & c=='=';
 		cond |= *p=='\n' & c=='#';
 		cond |= *p=='/' & c=='/';
 		cond |= *p=='/' & c=='*';
 		cond |= *p=='*' & c=='/';
-		cond |= may_twice(c) & *p==c;
-		cond |= may_equal(*p) & c=='=';
 	end:
 	}
 

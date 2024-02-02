@@ -1,35 +1,35 @@
 #include "cc.h"
 
-void optimize( struct stack * st, struct stack * ct )
+void optimize( struct stack ** st, struct stack ** ct )
 {
-	token_t t=pop(st,1);
+	token_t t=pop(st);
 	ct_t b,c;
 
 	switch( arity(t) )
 	{
 	case 0:
-		push(st,t,1);
+		push(st,t);
 		return;
 
 	case 3:
-		if( peek(st) != FG_NUM )
+		if( peek(*st) != FG_NUM )
 			goto err1;
 
-		pop(st,1);
-		c=pop(ct,sizeof(ct_t));
+		pop(st);
+		c=pop(ct);
 	case 2:
-		if( peek(st) != FG_NUM )
+		if( peek(*st) != FG_NUM )
 			goto err2;
 
-		pop(st,1);
-		b=pop(ct,sizeof(ct_t));
+		pop(st);
+		b=pop(ct);
 	}
 
-	if( peek(st) != FG_NUM )
+	if( peek(*st) != FG_NUM )
 		goto err3;
 
-	b=eval(t,pop(ct,sizeof(ct_t)),b,c);
-	push( ct, b, sizeof( ct_t) );
+	b=eval(t,pop(ct),b,c);
+	push( ct, b );
 
 	return;
 
