@@ -1,10 +1,12 @@
-#warning this is a warning
-/* This is a coment */
-// and this is another coment
-{
-	(30+40)*50;
-	;
-	return 30?40:50;
+#define N (7)
 
+{
+	/* Dead code */
+	1?(30+40)*50:0;
+	;
+
+	return N;
+
+#warning Dead code
 	return;
 } 

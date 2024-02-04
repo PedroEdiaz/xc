@@ -11,11 +11,11 @@ void safe( struct stack ** op , token_t t )
 			err( err_msg_ps[1], "')' or ':'", 1 );
 		return;
 	case SX_CLP:
-		if( isempty(*op) || pop(op)!=SX_OPP )
+		if( isempty(*op) || *(token_t*)pop(op,1)!=SX_OPP )
 			err( err_msg_ps[1], "'?' or '('", 1 );
 		return;
 	case SX_CLB:
-		if( isempty(*op) || pop(op)!=SX_OPB )
+		if( isempty(*op) || *(token_t*)pop(op,1)!=SX_OPB )
 			err( err_msg_ps[1], "{", 1 );
 		return;
 	}
@@ -59,21 +59,25 @@ void parse( int fd )
 			goto next;
 
 		case FG_NUM:
-			push( &ct, parse_ct(s) );
-			push( &st, tk );
+			{
+				ct_t val;
+				val=parse_ct(s);
+				push( &ct, &val, sizeof(ct_t) );
+			}
+			push( &st, &tk, 1 );
 			goto next;
 
 		default:
 			while( !isempty(op) && 
 				( peek(op)>tk || ( peek(op)==tk && !assoc(tk) ) ) )
 			{
-				push( &st, pop(&op) );
+				push( &st, pop(&op,1), 1 );
 				optimize( &st, &ct );
 			}
 
 			if( tk==op_trn )
 			{
-				push( &op, tk );
+				push( &op, &tk, 1 );
 				tk=SX_OPP;
 			}
 
@@ -86,13 +90,15 @@ void parse( int fd )
 			case SX_SMC:
 				if( !isempty(st) &&  peek(st)==FG_NUM )
 				{
-					pop(&st);
-					pop(&ct);
+					pop(&st,1);
+					pop(&ct,sizeof(ct_t));
 				}
+
+				/* Invert ct stack */
 				{
 					struct stack * tmp = NULL;
 					while( !isempty(st) )
-						push( &tmp, pop(&st) );
+						push( &tmp, pop(&st,1), 1 );
 					codegen( &tmp, &ct );
 				}
 			case SX_CLP:
@@ -100,7 +106,7 @@ void parse( int fd )
 				goto next;
 			}
 
-			push( &op, tk );
+			push( &op, &tk, 1 );
 
 		case FG_BLK:
 		}

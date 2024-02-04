@@ -1,64 +1,59 @@
-#define ct_t unsigned long
+#define token_t unsigned char
 
 struct stack
 {
-	struct stack *prev, *root;
-	ct_t value;
+	struct stack *prev;
+	void * value;
 };
 
-void push( struct stack ** s,  ct_t val );
+void push( struct stack ** s, void * val, char size );
 
 char isempty( struct stack * s );
-ct_t pop( struct stack ** s );
-ct_t peek( struct stack * s );
+void * pop( struct stack ** s, char size );
+token_t peek( struct stack * s );
 
 #ifdef IMPLEMENT
 #include <stdlib.h>
-
-void err( char *, char *, char );
 
 char isempty( struct stack * s )
 {
 	return !s;
 }
 
-void push( struct stack ** s, ct_t val )
+void push( struct stack ** s, void * val, char size )
 {
 	struct stack * p=malloc(sizeof(struct stack));
 
 	p->prev=*s;
-	p->value=val;
+	p->value=malloc(size);
+	memcpy( p->value, val, size );
 
-
-	if( isempty( *s ) )
-	{
-		p->root=p;
-		goto skip;
-	}
-
-	p->root=(*s)->root;
-skip:
 	*s=p;
 	return;
 }
 
-ct_t pop( struct stack ** s )
+void * pop( struct stack ** s, char size )
 {
 	struct stack * p;
-	ct_t res;
+	void * res;
 
-	res=(*s)->value;
+	res=malloc(size);
+	memcpy( res, (*s)->value, size );
+
 	p=(*s)->prev;
 
+	free((*s)->value);
 	free(*s);
 	*s=p;
 	
 	return res;
 }
 
-ct_t peek( struct stack * s )
+token_t peek( struct stack * s )
 {
-	return s->value;
+	token_t res;
+	memcpy( &res, s->value, 1 );
+	return res;
 }
 
 #endif

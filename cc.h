@@ -6,6 +6,7 @@
 
 #define token_t unsigned char
 #define fd_t unsigned char
+#define ct_t unsigned long
 
 extern const token_t op_trn;
 

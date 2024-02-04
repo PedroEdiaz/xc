@@ -2,34 +2,35 @@
 
 void optimize( struct stack ** st, struct stack ** ct )
 {
-	token_t t=pop(st);
+	token_t * t;
 	ct_t b,c;
 
-	switch( arity(t) )
+	t=pop(st,1);
+	switch( arity(*t) )
 	{
 	case 0:
-		push(st,t);
+		push(st,t,1);
 		return;
 
 	case 3:
 		if( peek(*st) != FG_NUM )
 			goto err1;
 
-		pop(st);
-		c=pop(ct);
+		pop(st,1);
+		c=*(ct_t*)pop(ct,sizeof(ct_t));
 	case 2:
 		if( peek(*st) != FG_NUM )
 			goto err2;
 
-		pop(st);
-		b=pop(ct);
+		pop(st,1);
+		b=*(ct_t*)pop(ct,sizeof(ct_t));
 	}
 
 	if( peek(*st) != FG_NUM )
 		goto err3;
 
-	b=eval(t,pop(ct),b,c);
-	push( ct, b );
+	b=eval(*t,*(ct_t*)pop(ct,sizeof(ct_t)),b,c);
+	push( ct, &b, sizeof(ct_t) );
 
 	return;
 

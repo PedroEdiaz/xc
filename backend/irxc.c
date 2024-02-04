@@ -4,16 +4,17 @@ int codegen( struct stack ** st, struct stack ** ct )
 {
 	while( !isempty(*st) )
 	{
-		char t;
+		token_t * t;
+		t=pop(st,1);
 
-		if(  (t=pop(st))!=FG_NUM )
+		if(  *t!=FG_NUM )
 		{
-			write_n( 1, t );
+			write_n( 1, *t );
 			goto cont;
 		}
 
 		write( 1, "\t", 1  );
-		write_n( 1, pop(ct) );
+		write_n( 1, *(ct_t*)pop(ct,sizeof(ct_t)) );
 	cont:
 		write( 1, "\n", 1  );
 	}

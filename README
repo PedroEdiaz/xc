@@ -2,6 +2,10 @@ XC
 ==
 A toy self-compiling C compiler.
 
+Bugs
+----
+ _	Can not use more than one token for defines
+
 Rodemap
 -------
  x	Optimization
@@ -11,7 +15,7 @@ Rodemap
  x 	Preprocesor
  	 * 	Warning
  	 * 	Error
- 	 _	Define
+ 	 *	Define
  	 _	Ifdef
  	 _	Include
  x	Integers

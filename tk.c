@@ -147,7 +147,7 @@ token_t token( char * s )
 	if( *s<=' ' & !*(s+1) )
 		return FG_BLK;
 
-	if( '0' <= *s && *s<='9' )
+	if( '0'<=*s & *s<='9' )
 	{
 		i=FG_NUM;
 		goto end;
@@ -218,7 +218,7 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 
 int assoc( token_t t )
 {
-	return t==OP_ASG || t==OP_TRN;
+	return t==OP_ASG | t==OP_TRN;
 }
 
 int arity( token_t t )
@@ -330,10 +330,8 @@ cont:
 	{
 		p[i++]=c;
 		c=0;
-		p[i]=0x00;
-		return p;
 	}
 
 	p[i]=0x00;
-	return p;
+	return definition(p);
 }
