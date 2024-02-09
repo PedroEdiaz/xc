@@ -59,7 +59,7 @@ char read_chr( fd_t fd )
 	return c;
 }
 
-void err( char * s, char * w, int b )
+void err( char * s, char * w, bool_t b )
 {
 	char * type[2] = { "Warning", "Error" };
 	char d[2] = { ':', '\n' };

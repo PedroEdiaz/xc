@@ -12,7 +12,7 @@ void safe( struct stack ** op , token_t t )
 		return;
 	case SX_CLP:
 		if( isempty(*op) || *(token_t*)pop(op,1)!=SX_OPP )
-			err( err_msg_ps[1], "'?' or '('", 1 );
+			err( err_msg_ps[1], "'(' or '?'", 1 );
 		return;
 	case SX_CLB:
 		if( isempty(*op) || *(token_t*)pop(op,1)!=SX_OPB )
@@ -21,21 +21,32 @@ void safe( struct stack ** op , token_t t )
 	}
 }
 
+struct dict
+{
+	char * key;
+	lp_t value;
+};
+
 void parse( int fd )
 {
-	struct stack *st=NULL, *ct=NULL, *op=NULL;
+	struct stack *st=NULL, *ct=NULL, 
+		*op=NULL, *dicts=NULL;
 
+	lp_t lp;
 	token_t tk;
 	char * s;
 
- 	next:
+	next:
 	while( s=tokenize(fd) )
 	{
-		switch( tk=token(s) )
+		tk=token(s,1);
+	token:
+		switch( tk )
 		{
 		case SX_CLC:
 			err( err_msg_ps[1], "/*", 1 );
 		case FG_ERR:
+		case FG_VAR:
 			err( err_msg_ps[0], s, 1 );
 		case FG_EOF:
 			goto end;
@@ -46,7 +57,7 @@ void parse( int fd )
 
 		case SX_OPC:
 			while( (s=tokenize(fd)) && tk!=SX_CLC )
-				tk=token(s);
+				tk=token(s,0);
 
 			if( !s )
 				err( err_msg_ps[1], "*/", 1 );
@@ -54,9 +65,43 @@ void parse( int fd )
 			goto next;
 
 		case SX_SNC:
-			while( read_chr(fd) !='\n' )
+			while( (s=tokenize(fd)) && *s!='\n' )
 				;
 			goto next;
+
+		case FG_LBL:
+			{
+				ct_t plp;
+				plp=label(s);
+				push( &ct, &plp, sizeof(ct_t) );
+			}
+
+			tk=FG_NUM;
+			push( &st, &tk, 1 );
+			goto next;
+
+		case KW_LABEL:
+		{
+			struct dict l;
+
+			l.value=lp;
+			l.key=malloc(strlen(s));
+			strcpy(l.key,s);
+			push( &dicts, &l, sizeof(struct dict) );
+
+			while( (tk=token(tokenize(fd),0)) == FG_BLK )
+				;
+
+			if( tk!=op_trn+1 )
+			{
+				free(l.key);
+				pop( &dicts, sizeof(struct dict ) );
+				err( "Unrechable", "Label", 1 );
+			}
+
+
+			goto next;
+		}
 
 		case FG_NUM:
 			{
@@ -88,7 +133,10 @@ void parse( int fd )
 			switch( tk )
 			{
 			case SX_SMC:
-				if( !isempty(st) &&  peek(st)==FG_NUM )
+				if( isempty(st) )
+					goto next;
+
+				if( peek(st)==FG_NUM )
 				{
 					pop(&st,1);
 					pop(&ct,sizeof(ct_t));
@@ -99,8 +147,9 @@ void parse( int fd )
 					struct stack * tmp = NULL;
 					while( !isempty(st) )
 						push( &tmp, pop(&st,1), 1 );
-					codegen( &tmp, &ct );
+					lp=codegen( &tmp, &ct );
 				}
+
 			case SX_CLP:
 			case SX_CLB:
 				goto next;
@@ -115,4 +164,12 @@ end:
 
 	if( !isempty(op) )
 		err( err_msg_ps[1], "}", 1 );
+
+	while( !isempty(dicts) )
+	{
+		struct dict * d;
+		d=(struct dict * )pop(&dicts,sizeof(struct dict) );
+		printf( "%d=%d\n", label(d->key), d->value );
+		free( d->key );
+	}
 }

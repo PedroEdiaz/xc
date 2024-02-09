@@ -47,7 +47,11 @@ char * sym[] =
 	[SX_OPP]="(",
 	[SX_CLP]=")",
 	[SX_SMC]=";",
+
 	[KW_RETURN]="return",
+	[KW_LABEL]=NULL,
+	[KW_GOTO]="goto",
+
 	[SX_LAST]=NULL,
 
 	[OP_ASG]="=",
@@ -83,27 +87,47 @@ char * sym[] =
 	[OP_UNA]=NULL,
 };
 
+char is_alfnum( char c )
+{
+	return  c=='_' | 
+		( 'a' <= c & c <= 'z' ) |
+		( 'A' <= c & c <= 'Z' ) |
+		( '0' <= c & c <= '9' ) ; 
+}
+
 token_t syntax( token_t last, token_t * tk )
 {
+	if( last == SX_SMC  & *tk!=SX_SMC )
+		return FG_EOF;
+
 	switch( *tk )
 	{
 	case SX_TPP:
-		return FG_ERR;
 	case SX_OPC:
 	case SX_CLC:
 	case SX_SNC:
 		return last;
 
 	case KW_RETURN:
-		return (last==FG_ERR )? *tk: FG_EOF;
+	case KW_GOTO:
+		return (last==FG_ERR)?*tk:FG_EOF;
+	case FG_VAR:
+		switch( last )
+		{
+		case FG_ERR:
+			*tk=KW_LABEL;
+			return FG_ERR;
+		case KW_GOTO:
+			*tk=FG_LBL;
+			return SX_SMC;
+		}
 	case FG_NUM:
-		return (last==FG_NUM)?FG_EOF:*tk;
+		return (last==FG_NUM)?FG_EOF:FG_NUM;
 	case SX_OPP:
 		return (last==FG_NUM)?FG_EOF:*tk;
 	case SX_CLP:
 		return (last==FG_NUM)?FG_NUM:FG_EOF;
 	case SX_OPB:
-		return (last==FG_ERR)?FG_ERR:FG_EOF;
 	case SX_CLB:
 		return (last==FG_ERR)?FG_ERR:FG_EOF;
 
@@ -111,11 +135,14 @@ token_t syntax( token_t last, token_t * tk )
 		switch( last )
 		{
 		case FG_ERR:
+		case FG_VAR:
+		case FG_NUM:
+		case SX_SMC:
 		case KW_RETURN:
 			return FG_ERR;
 		}
 
-		return (last==FG_NUM)?FG_ERR:FG_EOF;
+		return FG_EOF;
 
 	case OP_TRD:
 		*tk=SX_CLP;
@@ -139,7 +166,7 @@ token_t syntax( token_t last, token_t * tk )
 	return (last==FG_NUM)?*tk:FG_EOF;
 }
 
-token_t token( char * s ) 
+token_t token( char * s, bool_t b ) 
 {
 	static token_t last=FG_ERR;
 	unsigned char i=SX_START;
@@ -167,10 +194,17 @@ token_t token( char * s )
 		++i;
 	}
 
+	if( is_alfnum(*s) )
+	{
+		i=FG_VAR;
+		goto end;
+	}
+
 	return FG_ERR;
 
 end:
-	last = syntax(last, &i );
+	if( b )
+		last = syntax(last, &i );
 
 	if( last == FG_EOF )
 		return FG_ERR;
@@ -237,17 +271,10 @@ int arity( token_t t )
 	case OP_LGN: 
 		return 1;
 	case KW_RETURN:
+	case KW_GOTO:
 		return 0;
 	}
 	return 2;
-}
-
-char is_alfnum( char c )
-{
-	return  c=='_' | 
-		( 'a' <= c & c <= 'z' ) |
-		( 'A' <= c & c <= 'Z' ) |
-		( '0' <= c & c <= '9' ) ; 
 }
 
 char is_delim( char c )

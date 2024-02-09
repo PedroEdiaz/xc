@@ -1,5 +1,6 @@
 #include "cc.h"
 
+struct stack * defines=NULL;
 struct define
 {
 	char *key, *value;
@@ -18,8 +19,6 @@ char * trow( fd_t fd )
 	buff[i]=0x00;
 	return buff;
 }
-
-struct stack * defines=NULL;
 
 void parse_pp( fd_t fd )
 {
@@ -40,7 +39,7 @@ void parse_pp( fd_t fd )
 
 		while( (str=tokenize(fd)) )
 		{
-			if( token(str) != FG_BLK )
+			if( token(str,0) != FG_BLK )
 				goto end;
 		}
 	end:

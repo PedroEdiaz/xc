@@ -9,6 +9,7 @@ OBJ = \
 	tk.o \
 	er.o \
 	pp.o \
+	lb.o \
 	cc.o
 
 $(BIN): $(OBJ)
