@@ -5,9 +5,13 @@ main:
 {
 	;
 	goto next; 
-	goto idk; 
+
+	/* Unrechable code */
 	return 1?(30+40)*50:0;
+	goto idk; 
 next:
 	return N;
+
+	// Unrechable code
 	return;
 } 

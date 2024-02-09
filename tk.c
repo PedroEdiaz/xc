@@ -87,7 +87,7 @@ char * sym[] =
 	[OP_UNA]=NULL,
 };
 
-char is_alfnum( char c )
+bool_t is_alfnum( char c )
 {
 	return  c=='_' | 
 		( 'a' <= c & c <= 'z' ) |
@@ -250,9 +250,14 @@ ct_t eval( token_t op, ct_t a, ct_t b, ct_t c )
 	return 1;
 }
 
-int assoc( token_t t )
+bool_t assoc( token_t t )
 {
 	return t==OP_ASG | t==OP_TRN;
+}
+
+bool_t unreach( token_t t )
+{
+	return t==KW_GOTO | t==KW_RETURN;
 }
 
 int arity( token_t t )
@@ -277,17 +282,17 @@ int arity( token_t t )
 	return 2;
 }
 
-char is_delim( char c )
+bool_t is_delim( char c )
 {
 	return c=='\'' | c=='"' ;
 }
 
-char may_twice_equal( char c )
+bool_t may_twice_equal( char c )
 {
 	return c=='<' | c=='>' ;
 }
 
-char may_twice( char c )
+bool_t may_twice( char c )
 {
 	return may_twice_equal(c) |
 		c=='+' | c=='-' | 
@@ -295,7 +300,7 @@ char may_twice( char c )
 
 }
 
-char may_equal( char c )
+bool_t may_equal( char c )
 {
 	return may_twice(c) | 
 		c=='!' | c=='=' |

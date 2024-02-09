@@ -14,6 +14,7 @@ token_t peek( struct stack * s );
 
 #ifdef IMPLEMENT
 #include <stdlib.h>
+#include <string.h>
 
 char isempty( struct stack * s )
 {

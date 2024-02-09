@@ -5,12 +5,19 @@ A toy self-compiling C compiler.
 Bugs
 ----
  _	Can not use more than one token for defines
+ _	Check syntax rules for gotos and labels
+ _	Clean code for labels in ps.c
+ _	Warn for unused labels
+ _	Warn when there is no labels to goto
 
 Rodemap
 -------
+ _	Backpatching
+ 	 _ 	Deadcode elimination
+
  x	Optimization
  	 *	Constant folding
- 	 x	Deadcode elimination
+ 	 *	Deadcode elimination
  	 _	Constant Propagation
  x 	Preprocesor
  	 * 	Warning
@@ -28,7 +35,7 @@ Rodemap
 	 _	Variables
  *	Comments
  *	Return
- _	Gotos
+ *	Gotos
  _	If
  _	While
  _	Functions

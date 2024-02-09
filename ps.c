@@ -21,6 +21,7 @@ void safe( struct stack ** op , token_t t )
 	}
 }
 
+struct stack *dicts=NULL;
 struct dict
 {
 	char * key;
@@ -30,11 +31,13 @@ struct dict
 void parse( int fd )
 {
 	struct stack *st=NULL, *ct=NULL, 
-		*op=NULL, *dicts=NULL;
+		*op=NULL;
 
 	lp_t lp;
 	token_t tk;
 	char * s;
+
+	bool_t rechable=0;
 
 	next:
 	while( s=tokenize(fd) )
@@ -84,6 +87,8 @@ void parse( int fd )
 		{
 			struct dict l;
 
+			rechable=1;
+
 			l.value=lp;
 			l.key=malloc(strlen(s));
 			strcpy(l.key,s);
@@ -98,7 +103,6 @@ void parse( int fd )
 				pop( &dicts, sizeof(struct dict ) );
 				err( "Unrechable", "Label", 1 );
 			}
-
 
 			goto next;
 		}
@@ -143,12 +147,24 @@ void parse( int fd )
 				}
 
 				/* Invert ct stack */
+				if( rechable )
 				{
 					struct stack * tmp = NULL;
+
+					if( unreach(peek(st)) )
+						rechable=0;
+
 					while( !isempty(st) )
 						push( &tmp, pop(&st,1), 1 );
+
 					lp=codegen( &tmp, &ct );
+					goto next;
 				}
+
+				/* Unrechable code */
+				while( !isempty(st) )
+					if( *(token_t*)pop(&st,1)==FG_NUM )
+						pop( &ct, sizeof(ct_t) );
 
 			case SX_CLP:
 			case SX_CLB:
@@ -169,7 +185,10 @@ end:
 	{
 		struct dict * d;
 		d=(struct dict * )pop(&dicts,sizeof(struct dict) );
-		printf( "%d=%d\n", label(d->key), d->value );
+		write_n( 1, label(d->key) );
+		write( 1, "=", 1 );
+		write_n( 1, d->value );
+		write( 1, "\n", 1 );
 		free( d->key );
 	}
 }

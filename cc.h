@@ -14,11 +14,12 @@ extern const token_t op_trn;
 
 void parse( int );
 
-token_t token( char * s, bool_t );
+token_t token( char *, bool_t );
 ct_t eval( token_t, ct_t, ct_t, ct_t );
-char * tokenize( fd_t fd );
+char * tokenize( fd_t );
 int arity( token_t );
-int assoc( token_t );
+bool_t assoc( token_t );
+bool_t unreach( token_t );
 
 lp_t codegen( struct stack **, struct stack ** );
 void optimize( struct stack **, struct stack ** );
@@ -31,6 +32,9 @@ void write_n( fd_t, ct_t );
 char read_chr( fd_t  );
 
 ct_t parse_ct( char * );
+void parse_pp( fd_t );
+lp_t label( char * );
+char * definition( char * );
 
 enum
 {
